@@ -17,7 +17,9 @@
 
 package com.huawei.flowcontrol.retry;
 
+import com.huawei.flowcontrol.common.entity.FlowControlResult;
 import com.huawei.flowcontrol.common.entity.HttpRequestEntity;
+import com.huawei.flowcontrol.common.entity.RequestEntity.RequestType;
 import com.huawei.flowcontrol.common.handler.retry.AbstractRetry;
 import com.huawei.flowcontrol.common.handler.retry.Retry;
 import com.huawei.flowcontrol.common.handler.retry.RetryContext;
@@ -27,11 +29,14 @@ import com.huaweicloud.sermant.core.common.LoggerFactory;
 import com.huaweicloud.sermant.core.plugin.agent.entity.ExecuteContext;
 
 import feign.Request;
+import feign.Response;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +52,8 @@ import java.util.logging.Logger;
  */
 public class FeignRequestInterceptor extends InterceptorSupporter {
     private static final Logger LOGGER = LoggerFactory.getLogger();
+
+    private final String className = FeignRequestInterceptor.class.getName();
 
     private final Retry retry = new FeignRetry();
 
@@ -64,7 +71,13 @@ public class FeignRequestInterceptor extends InterceptorSupporter {
             final URL url = new URL(request.url());
             final HashMap<String, String> headers = new HashMap<>(request.headers().size());
             request.headers().forEach((headerName, headValue) -> headers.put(headerName, headValue.iterator().next()));
-            return Optional.of(new HttpRequestEntity(url.getPath(), headers, request.httpMethod().name()));
+            return Optional.of(new HttpRequestEntity.Builder()
+                    .setRequestType(RequestType.CLIENT)
+                    .setApiPath(url.getPath())
+                    .setHeaders(headers)
+                    .setMethod(request.method())
+                    .setServiceName(url.getHost())
+                    .build());
         } catch (MalformedURLException ignored) {
             // ignored
         }
@@ -73,11 +86,37 @@ public class FeignRequestInterceptor extends InterceptorSupporter {
 
     @Override
     protected final ExecuteContext doBefore(ExecuteContext context) {
+        final FlowControlResult flowControlResult = new FlowControlResult();
+        final Request request = (Request) context.getArguments()[0];
+        final Optional<HttpRequestEntity> httpRequestEntity = convertToHttpEntity(request);
+        if (!httpRequestEntity.isPresent()) {
+            return context;
+        }
+        chooseHttpService().onBefore(className, httpRequestEntity.get(), flowControlResult);
+        if (flowControlResult.isSkip()) {
+            final String responseMsg = flowControlResult.buildResponseMsg();
+            context.skip(Response.builder()
+                    .status(flowControlResult.getResult().getCode())
+                    .body(responseMsg, StandardCharsets.UTF_8)
+                    .headers(Collections.emptyMap())
+                    .reason(responseMsg)
+                    .request(request)
+                    .build());
+        } else {
+            context.skip(null);
+        }
+        return context;
+    }
+
+    @Override
+    protected ExecuteContext doThrow(ExecuteContext context) {
+        chooseHttpService().onThrow(className, context.getThrowable());
         return context;
     }
 
     @Override
     protected final ExecuteContext doAfter(ExecuteContext context) {
+        chooseHttpService().onAfter(className, context.getResult());
         final Object[] allArguments = context.getArguments();
         Request request = (Request) allArguments[0];
         Object result = context.getResult();
@@ -87,20 +126,21 @@ public class FeignRequestInterceptor extends InterceptorSupporter {
                 return context;
             }
             RetryContext.INSTANCE.markRetry(retry);
+            RetryContext.INSTANCE.buildRetryPolicy(httpRequestEntity.get());
+            final Supplier<Object> retryFunc = createRetryFunc(context.getObject(),
+                    context.getMethod(), allArguments, context.getResult());
+            result = retryFunc.get();
             final List<io.github.resilience4j.retry.Retry> handlers = getRetryHandler()
                 .getHandlers(httpRequestEntity.get());
-            if (!handlers.isEmpty() && needRetry(handlers.get(0), result, null)) {
-                // 重试仅有一个策略
-                final Supplier<Object> retryFunc = createRetryFunc(context.getObject(),
-                    context.getMethod(), allArguments, context.getResult());
+            if (!handlers.isEmpty() && needRetry(handlers.get(0), result, context.getThrowable())) {
                 result = handlers.get(0).executeCheckedSupplier(retryFunc::get);
             }
         } catch (Throwable throwable) {
             LOGGER.warning(String.format(Locale.ENGLISH,
                 "Failed to invoke method:%s for few times, reason:%s",
-                context.getMethod().getName(), throwable.getCause()));
+                context.getMethod().getName(), getExMsg(throwable)));
         } finally {
-            RetryContext.INSTANCE.removeRetry();
+            RetryContext.INSTANCE.remove();
         }
         context.changeResult(result);
         return context;

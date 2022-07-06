@@ -20,11 +20,10 @@ package com.huawei.fowcontrol.res4j.service;
 import com.huawei.flowcontrol.common.entity.FlowControlResult;
 import com.huawei.flowcontrol.common.entity.RequestEntity;
 import com.huawei.flowcontrol.service.rest4j.DubboRest4jService;
-import com.huawei.fowcontrol.res4j.handler.HandlerFacade;
-import com.huawei.fowcontrol.res4j.util.Rest4jExceptionUtils;
+import com.huawei.fowcontrol.res4j.chain.HandlerChainEntry;
 
 /**
- * http请求拦截逻辑实现
+ * dubbo请求拦截
  *
  * @author zhouss
  * @since 2022-01-25
@@ -33,33 +32,23 @@ public class DubboRest4jServiceImpl extends DubboRest4jService {
     private final Exception dubboException = new Exception("dubbo exception");
 
     @Override
-    public void onBefore(RequestEntity requestEntity, FlowControlResult fixedResult, boolean isProvider) {
-        try {
-            HandlerFacade.INSTANCE.injectHandlers(requestEntity, isProvider);
-        } catch (Exception ex) {
-            Rest4jExceptionUtils.handleException(ex, fixedResult);
-            if (Rest4jExceptionUtils.isNeedReleasePermit(ex)) {
-                // 流控异常及时释放资源
-                HandlerFacade.INSTANCE.releaseDubboPermit();
-            }
-            HandlerFacade.INSTANCE.removeHandlers(isProvider);
-        }
+    public void onBefore(String sourceName, RequestEntity requestEntity, FlowControlResult flowControlResult,
+            boolean isProvider) {
+        HandlerChainEntry.INSTANCE.onDubboBefore(sourceName, requestEntity, flowControlResult, isProvider);
     }
 
     @Override
-    public void onAfter(Object result, boolean isProvider, boolean hasException) {
-        HandlerFacade.INSTANCE.onDubboResult(result);
+    public void onAfter(String sourceName, Object result, boolean isProvider, boolean hasException) {
         if (hasException) {
             // 此处主要标记异常状态，具体异常信息与记录结果无关
-            HandlerFacade.INSTANCE.onDubboThrow(dubboException);
+            HandlerChainEntry.INSTANCE.onDubboThrow(sourceName, dubboException, isProvider);
         }
-        HandlerFacade.INSTANCE.removeHandlers(isProvider);
+        HandlerChainEntry.INSTANCE.onDubboResult(sourceName, result, isProvider);
     }
 
     @Override
-    public boolean onThrow(Throwable throwable, boolean isProvider) {
-        HandlerFacade.INSTANCE.onDubboThrow(throwable);
-        HandlerFacade.INSTANCE.removeHandlers(isProvider);
+    public boolean onThrow(String sourceName, Throwable throwable, boolean isProvider) {
+        HandlerChainEntry.INSTANCE.onDubboThrow(sourceName, dubboException, isProvider);
         return false;
     }
 }

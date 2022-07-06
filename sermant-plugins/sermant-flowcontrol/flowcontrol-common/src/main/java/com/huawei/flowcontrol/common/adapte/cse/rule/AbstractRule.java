@@ -32,7 +32,7 @@ import java.util.Optional;
  * @author zhouss
  * @since 2021-11-15
  */
-public abstract class AbstractRule extends Configurable implements Rule {
+public abstract class AbstractRule extends Configurable implements Rule, Comparable<AbstractRule> {
     /**
      * 时间格式
      */
@@ -42,6 +42,24 @@ public abstract class AbstractRule extends Configurable implements Rule {
      * duration转换前缀
      */
     private static final String DURATION_PREFIX = "PT";
+
+    /**
+     * 规则优先级, 越小则优先级越高
+     */
+    protected int order = 0;
+
+    @Override
+    public int compareTo(AbstractRule target) {
+        return order - target.order;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
 
     @Override
     public boolean isInValid() {

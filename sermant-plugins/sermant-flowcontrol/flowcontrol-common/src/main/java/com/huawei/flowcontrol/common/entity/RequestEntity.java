@@ -17,6 +17,8 @@
 
 package com.huawei.flowcontrol.common.entity;
 
+import com.huawei.flowcontrol.common.cache.Timed;
+
 import java.util.Map;
 
 /**
@@ -25,7 +27,7 @@ import java.util.Map;
  * @author zhouss
  * @since 2022-01-22
  */
-public interface RequestEntity {
+public interface RequestEntity extends Timed {
     /**
      * 请求路径
      *
@@ -48,6 +50,20 @@ public interface RequestEntity {
     String getMethod();
 
     /**
+     * 服务名
+     *
+     * @return 服务名
+     */
+    String getServiceName();
+
+    /**
+     * 请求方向
+     *
+     * @return 请求方向
+     */
+    RequestType getRequestType();
+
+    /**
      * 必须实现equal方法
      *
      * @param obj 比较目标
@@ -63,4 +79,26 @@ public interface RequestEntity {
      */
     @Override
     int hashCode();
+
+    /**
+     * 请求类型, 标记请求的方向, 客户端请求或者服务端请求
+     *
+     * @since 2022-07-20
+     */
+    enum RequestType {
+        /**
+         * 客户端请求, 即出去的请求
+         */
+        CLIENT,
+
+        /**
+         * 服务端请求, 即进来的请求
+         */
+        SERVER,
+
+        /**
+         * 均可处理
+         */
+        BOTH
+    }
 }

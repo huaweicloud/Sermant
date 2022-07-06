@@ -49,7 +49,7 @@ public class SpringLoadbalancerFeignResponseInterceptor extends GraceSwitchInter
         Request request = (Request) arguments[0];
         HashMap<String, Collection<String>> headers = new HashMap<>(request.headers());
         headers.putAll(getGraceIpHeaders());
-        arguments[0] = Request.create(request.httpMethod(), request.url(), headers, request.body(), request.charset());
+        arguments[0] = Request.create(request.method(), request.url(), headers, request.body(), request.charset());
         return context;
     }
 

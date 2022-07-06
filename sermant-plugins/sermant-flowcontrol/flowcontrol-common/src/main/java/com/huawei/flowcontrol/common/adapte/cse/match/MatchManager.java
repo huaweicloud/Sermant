@@ -39,20 +39,41 @@ public enum MatchManager {
 
     private static final int DEFAULT_BUSINESS_SIZE = 4;
 
+    private final MatchedCache matchedCache = new MatchedCache();
+
+    private MatchGroupResolver matchGroupResolver;
+
     /**
      * 匹配所有业务场景
      *
      * @param request 请求信息
      * @return 匹配的业务场景
      */
-    public Set<String> match(RequestEntity request) {
-        return match(request, null);
+    public Set<String> matchWithCache(RequestEntity request) {
+        return matchWithCache(request, null);
     }
 
     /**
      * 匹配指定业务场景名
      *
-     * @param request      请求信息
+     * @param request 请求信息
+     * @param businessName 业务场景名
+     * @return 匹配的业务场景
+     */
+    public Set<String> matchWithCache(RequestEntity request, String businessName) {
+        final Set<String> businesses = matchedCache.getDelegate().get(request);
+        if (businesses != null) {
+            return businesses;
+        }
+        final Set<String> result = match(request, businessName);
+        matchedCache.getDelegate().put(request, result);
+        return result;
+    }
+
+    /**
+     * 匹配指定业务场景名
+     *
+     * @param request 请求信息
      * @param businessName 业务场景名
      * @return 匹配的业务场景
      */
@@ -61,7 +82,7 @@ public enum MatchManager {
         final Map<String, BusinessMatcher> matchGroups = getMatchGroups(businessName);
         final Set<String> result = new HashSet<>(DEFAULT_BUSINESS_SIZE);
         for (Map.Entry<String, BusinessMatcher> entry : matchGroups.entrySet()) {
-            if (entry.getValue().match(request.getApiPath(), request.getHeaders(), request.getMethod())) {
+            if (entry.getValue().match(request)) {
                 if (!ResolverManager.INSTANCE.hasMatchedRule(entry.getKey())) {
                     continue;
                 }
@@ -70,12 +91,11 @@ public enum MatchManager {
                 result.add(entry.getKey());
             }
         }
-        return result;
+        return result.isEmpty() ? Collections.emptySet() : result;
     }
 
     private Map<String, BusinessMatcher> getMatchGroups(String businessName) {
-        final MatchGroupResolver resolver = ResolverManager.INSTANCE.getResolver(MatchGroupResolver.CONFIG_KEY);
-        final Map<String, BusinessMatcher> matchGroups = resolver.getRules();
+        final Map<String, BusinessMatcher> matchGroups = getMatchGroupResolver().getRules();
         if (businessName == null) {
             return matchGroups;
         }
@@ -84,5 +104,16 @@ public enum MatchManager {
             return Collections.emptyMap();
         }
         return Collections.singletonMap(businessName, businessMatcher);
+    }
+
+    private MatchGroupResolver getMatchGroupResolver() {
+        if (matchGroupResolver == null) {
+            matchGroupResolver = ResolverManager.INSTANCE.getResolver(MatchGroupResolver.CONFIG_KEY);
+        }
+        return matchGroupResolver;
+    }
+
+    public MatchedCache getMatchedCache() {
+        return matchedCache;
     }
 }

@@ -20,6 +20,8 @@ package com.huawei.flowcontrol;
 import com.huawei.flowcontrol.common.config.CommonConst;
 import com.huawei.flowcontrol.common.entity.DubboRequestEntity;
 import com.huawei.flowcontrol.common.entity.FlowControlResult;
+import com.huawei.flowcontrol.common.entity.RequestEntity.RequestType;
+import com.huawei.flowcontrol.common.enums.FlowControlEnum;
 import com.huawei.flowcontrol.common.util.ConvertUtils;
 import com.huawei.flowcontrol.service.InterceptorSupporter;
 
@@ -42,6 +44,8 @@ import java.util.Locale;
  * @since 2022-02-11
  */
 public class ApacheDubboInterceptor extends InterceptorSupporter {
+    private final String className = ApacheDubboInterceptor.class.getName();
+
     /**
      * 转换apache dubbo 注意，该方法不可抽出，由于宿主依赖仅可由该拦截器加载，因此抽出会导致找不到类
      *
@@ -65,7 +69,11 @@ public class ApacheDubboInterceptor extends InterceptorSupporter {
 
         // 高版本使用api invocation.getTargetServiceUniqueName获取路径，此处使用版本加接口，达到的最终结果一致
         String apiPath = ConvertUtils.buildApiPath(interfaceName, version, methodName);
-        return new DubboRequestEntity(apiPath, Collections.unmodifiableMap(invocation.getAttachments()));
+        final boolean isProvider = isProvider(invocation.getInvoker());
+        return new DubboRequestEntity(apiPath, Collections.unmodifiableMap(invocation.getAttachments()),
+                isProvider ? RequestType.SERVER : RequestType.CLIENT,
+                invocation.getInvoker().getUrl().getParameter(isProvider ? CommonConst.DUBBO_APPLICATION
+                        : CommonConst.DUBBO_REMOTE_APPLICATION));
     }
 
     @Override
@@ -74,43 +82,49 @@ public class ApacheDubboInterceptor extends InterceptorSupporter {
         if (allArguments[1] instanceof Invocation) {
             final FlowControlResult result = new FlowControlResult();
             Invocation invocation = (Invocation) allArguments[1];
-            chooseDubboService().onBefore(convertToApacheDubboEntity(invocation), result, isProvider(context));
+            chooseDubboService().onBefore(className, convertToApacheDubboEntity(invocation), result,
+                    isProvider(context));
             if (result.isSkip()) {
                 context.skip(AsyncRpcResult.newDefaultAsyncResult(
-                    wrapException(invocation, (Invoker<?>) allArguments[0], result.getResult().getMsg()), invocation));
+                        wrapException(invocation, (Invoker<?>) allArguments[0], result.getResult()),
+                        invocation));
             }
         }
         return context;
     }
 
-    private RpcException wrapException(Invocation invocation, Invoker<?> invoker, String msg) {
-        return new RpcException(CommonConst.TOO_MANY_REQUEST_CODE,
-            String.format(Locale.ENGLISH, "Failed to invoke service %s.%s: %s",
-                invoker.getInterface().getName(), invocation.getMethodName(), msg));
+    private RpcException wrapException(Invocation invocation, Invoker<?> invoker, FlowControlEnum flowControlEnum) {
+        return new RpcException(flowControlEnum.getCode(),
+                String.format(Locale.ENGLISH, "Failed to invoke service %s.%s: %s",
+                        invoker.getInterface().getName(), invocation.getMethodName(), flowControlEnum.getMsg()));
     }
 
     private boolean isProvider(ExecuteContext context) {
         final Object argument = context.getArguments()[0];
         if (argument instanceof Invoker) {
             Invoker<?> invoker = (Invoker<?>) argument;
-            return !CommonConst.DUBBO_CONSUMER.equals(invoker.getUrl().getParameter(CommonConst.DUBBO_SIDE,
-                CommonConst.DUBBO_PROVIDER));
+            return isProvider(invoker);
         }
         return false;
+    }
+
+    private boolean isProvider(Invoker<?> invoker) {
+        return !CommonConst.DUBBO_CONSUMER.equals(invoker.getUrl().getParameter(CommonConst.DUBBO_SIDE,
+                CommonConst.DUBBO_PROVIDER));
     }
 
     @Override
     protected final ExecuteContext doAfter(ExecuteContext context) {
         Result result = (Result) context.getResult();
         if (result != null) {
-            chooseDubboService().onAfter(result, isProvider(context), result.hasException());
+            chooseDubboService().onAfter(className, result, isProvider(context), result.hasException());
         }
         return context;
     }
 
     @Override
     protected final ExecuteContext doThrow(ExecuteContext context) {
-        chooseDubboService().onThrow(context.getThrowable(), isProvider(context));
+        chooseDubboService().onThrow(className, context.getThrowable(), isProvider(context));
         return context;
     }
 

@@ -30,22 +30,25 @@ public interface HttpService {
     /**
      * 前置拦截
      *
+     * @param sourceName 发起原, 建议为目标拦截器权限定名, 该值用于在跨多个拦截器时区分线程变量
      * @param requestEntity 请求信息
      * @param fixedResult   修正结果
      */
-    void onBefore(RequestEntity requestEntity, FlowControlResult fixedResult);
+    void onBefore(String sourceName, RequestEntity requestEntity, FlowControlResult fixedResult);
 
     /**
      * 后置方法
      *
+     * @param sourceName 发起原, 建议为目标拦截器权限定名, 该值用于在跨多个拦截器时区分线程变量
      * @param result 响应结果
      */
-    void onAfter(Object result);
+    void onAfter(String sourceName, Object result);
 
     /**
      * 异常抛出方法
      *
+     * @param sourceName 发起原, 建议为目标拦截器权限定名, 该值用于在跨多个拦截器时区分线程变量
      * @param throwable 异常信息
      */
-    void onThrow(Throwable throwable);
+    void onThrow(String sourceName, Throwable throwable);
 }

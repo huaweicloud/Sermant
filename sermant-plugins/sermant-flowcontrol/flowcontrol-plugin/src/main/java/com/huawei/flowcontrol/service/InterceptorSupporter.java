@@ -229,6 +229,19 @@ public abstract class InterceptorSupporter extends ReflectMethodCacheSupport imp
     }
 
     /**
+     * 解析异常信息
+     *
+     * @param throwable 异常
+     * @return msg
+     */
+    protected String getExMsg(Throwable throwable) {
+        if (throwable instanceof InvokerWrapperException) {
+            return ((InvokerWrapperException)throwable).getRealException().getMessage();
+        }
+        return throwable.getMessage();
+    }
+
+    /**
      * 前置触发点
      *
      * @param context 执行上下文

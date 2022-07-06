@@ -26,6 +26,36 @@ import java.util.Objects;
  * @since 2022-02-28
  */
 public abstract class AbstractRequestEntity implements RequestEntity {
+    /**
+     * 服务名
+     */
+    private String serviceName;
+
+    /**
+     * 请求类型
+     */
+    private RequestType requestType;
+
+    private long timestamp;
+
+    @Override
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    @Override
+    public RequestType getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(RequestType requestType) {
+        this.requestType = requestType;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -36,11 +66,22 @@ public abstract class AbstractRequestEntity implements RequestEntity {
         }
         AbstractRequestEntity that = (AbstractRequestEntity) obj;
         return Objects.equals(getHeaders(), that.getHeaders()) && Objects.equals(getApiPath(), that.getApiPath())
-            && Objects.equals(getMethod(), that.getMethod());
+            && Objects.equals(getMethod(), that.getMethod()) && Objects.equals(getServiceName(), that.getServiceName())
+                && getRequestType() == that.getRequestType();
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getHeaders(), getApiPath(), getMethod());
+    }
+
+    @Override
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    @Override
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

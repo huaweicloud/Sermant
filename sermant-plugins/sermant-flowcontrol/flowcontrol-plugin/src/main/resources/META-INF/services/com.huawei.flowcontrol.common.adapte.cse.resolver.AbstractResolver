@@ -18,5 +18,6 @@
 com.huawei.flowcontrol.common.adapte.cse.match.MatchGroupResolver
 com.huawei.flowcontrol.common.adapte.cse.resolver.BulkheadRuleResolver
 com.huawei.flowcontrol.common.adapte.cse.resolver.CircuitBreakerRuleResolver
+com.huawei.flowcontrol.common.adapte.cse.resolver.InstanceIsolationRuleResolver
 com.huawei.flowcontrol.common.adapte.cse.resolver.RateLimitingRuleResolver
 com.huawei.flowcontrol.common.adapte.cse.resolver.RetryResolver

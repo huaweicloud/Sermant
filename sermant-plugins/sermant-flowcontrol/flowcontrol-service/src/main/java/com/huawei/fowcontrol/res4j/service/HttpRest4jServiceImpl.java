@@ -20,8 +20,7 @@ package com.huawei.fowcontrol.res4j.service;
 import com.huawei.flowcontrol.common.entity.FlowControlResult;
 import com.huawei.flowcontrol.common.entity.RequestEntity;
 import com.huawei.flowcontrol.service.rest4j.HttpRest4jService;
-import com.huawei.fowcontrol.res4j.handler.HandlerFacade;
-import com.huawei.fowcontrol.res4j.util.Rest4jExceptionUtils;
+import com.huawei.fowcontrol.res4j.chain.HandlerChainEntry;
 
 /**
  * http请求拦截逻辑实现
@@ -31,28 +30,17 @@ import com.huawei.fowcontrol.res4j.util.Rest4jExceptionUtils;
  */
 public class HttpRest4jServiceImpl extends HttpRest4jService {
     @Override
-    public void onBefore(RequestEntity requestEntity, FlowControlResult fixedResult) {
-        try {
-            HandlerFacade.INSTANCE.injectHandlers(requestEntity);
-        } catch (Exception ex) {
-            Rest4jExceptionUtils.handleException(ex, fixedResult);
-            if (Rest4jExceptionUtils.isNeedReleasePermit(ex)) {
-                // 流控异常及时释放资源
-                HandlerFacade.INSTANCE.releasePermit();
-            }
-            HandlerFacade.INSTANCE.removeHandlers();
-        }
+    public void onBefore(String sourceName, RequestEntity requestEntity, FlowControlResult flowControlResult) {
+        HandlerChainEntry.INSTANCE.onBefore(sourceName, requestEntity, flowControlResult);
     }
 
     @Override
-    public void onAfter(Object result) {
-        HandlerFacade.INSTANCE.onResult(result);
-        HandlerFacade.INSTANCE.removeHandlers();
+    public void onAfter(String sourceName, Object result) {
+        HandlerChainEntry.INSTANCE.onResult(sourceName, result);
     }
 
     @Override
-    public void onThrow(Throwable throwable) {
-        HandlerFacade.INSTANCE.onThrow(throwable);
-        HandlerFacade.INSTANCE.removeHandlers();
+    public void onThrow(String sourceName, Throwable throwable) {
+        HandlerChainEntry.INSTANCE.onThrow(sourceName, throwable);
     }
 }

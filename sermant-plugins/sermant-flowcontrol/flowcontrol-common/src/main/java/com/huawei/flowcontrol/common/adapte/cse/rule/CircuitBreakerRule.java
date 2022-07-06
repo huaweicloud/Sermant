@@ -136,6 +136,32 @@ public class CircuitBreakerRule extends AbstractRule {
      */
     private long parsedSlidingWindowSize = DEFAULT_SLIDING_WINDOW_SIZE;
 
+    /**
+     * 强制关闭熔断
+     */
+    private boolean forceClosed = false;
+
+    /**
+     * 强制开启熔断
+     */
+    private boolean forceOpen = false;
+
+    public boolean isForceClosed() {
+        return forceClosed;
+    }
+
+    public void setForceClosed(boolean forceClosed) {
+        this.forceClosed = forceClosed;
+    }
+
+    public boolean isForceOpen() {
+        return forceOpen;
+    }
+
+    public void setForceOpen(boolean forceOpen) {
+        this.forceOpen = forceOpen;
+    }
+
     @Override
     public boolean isInValid() {
         if (failureRateThreshold > MAX_PERCENT || failureRateThreshold <= MIN_PERCENT) {

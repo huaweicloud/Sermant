@@ -43,6 +43,6 @@ public class RetryHandlerV2Test extends BaseTest {
         RetryContext.INSTANCE.markRetry(alibabaDubboRetry);
         final Retry test = retryHandlerV2.createProcessor("test", new RetryRule()).get();
         Assert.assertNotNull(test);
-        RetryContext.INSTANCE.removeRetry();
+        RetryContext.INSTANCE.remove();
     }
 }

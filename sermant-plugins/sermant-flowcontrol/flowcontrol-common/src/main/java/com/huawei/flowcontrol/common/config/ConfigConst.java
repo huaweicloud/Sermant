@@ -219,6 +219,36 @@ public class ConfigConst {
      */
     public static final String PROJECT_NAME = "project.name";
 
+    /**
+     * 默认最大的缓存数
+     */
+    public static final int DEFAULT_MAX_CACHE_SIZE = 1000;
+
+    /**
+     * 默认的缓存过期检查时间, 单位秒, 默认一个小时
+     */
+    public static final long DEFAULT_TIME_CACHE_CHECK_INTERVAL = 3600L;
+
+    /**
+     * 连接超时时间
+     */
+    public static final long CONNECT_TIMEOUT_MS = 1000L;
+
+    /**
+     * 响应超时时间
+     */
+    public static final long SOCKET_READ_TIMEOUT_MS = 1000L;
+
+    /**
+     * rest template OKHTTP 协议
+     */
+    public static final String REST_TEMPLATE_REQUEST_FACTORY_OK_HTTP = "okHttp";
+
+    /**
+     * 请求httpclient协议
+     */
+    public static final String REST_TEMPLATE_REQUEST_FACTORY_HTTP = "http";
+
     private ConfigConst() {
     }
 }

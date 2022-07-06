@@ -16,7 +16,7 @@
 
 package com.huawei.flowcontrol.common.adapte.cse.match;
 
-import java.util.Map;
+import com.huawei.flowcontrol.common.entity.RequestEntity;
 
 /**
  * 匹配器
@@ -28,10 +28,8 @@ public interface Matcher {
     /**
      * 匹配
      *
-     * @param url 请求地址
-     * @param headers 请求头
-     * @param method 方法类型
+     * @param requestEntity 请求体
      * @return 是否匹配
      */
-    boolean match(String url, Map<String, String> headers, String method);
+    boolean match(RequestEntity requestEntity);
 }

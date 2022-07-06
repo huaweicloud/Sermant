@@ -27,6 +27,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 
 import java.time.Duration;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -50,7 +51,11 @@ public class CircuitBreakerHandler extends AbstractRequestHandler<CircuitBreaker
                 .slidingWindowType(getSlidingWindowType(rule.getSlidingWindowType()))
                 .slidingWindowSize((int) rule.getParsedSlidingWindowSize())
                 .build())
-            .circuitBreaker(businessName));
+            .circuitBreaker(breakerName(businessName, rule)));
+    }
+
+    private String breakerName(String businessName, CircuitBreakerRule rule) {
+        return String.format(Locale.ENGLISH, "%s|%s|%s", businessName, rule.isForceClosed(), rule.isForceOpen());
     }
 
     private CircuitBreakerConfig.SlidingWindowType getSlidingWindowType(String type) {
@@ -61,7 +66,7 @@ public class CircuitBreakerHandler extends AbstractRequestHandler<CircuitBreaker
     }
 
     @Override
-    protected final String configKey() {
+    protected String configKey() {
         return CircuitBreakerRuleResolver.CONFIG_KEY;
     }
 }

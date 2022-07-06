@@ -246,6 +246,84 @@ public class FlowControlConfig implements PluginConfig {
      */
     private String retryClusterInvoker = "sermant";
 
+    /**
+     * 最大缓存数
+     */
+    private int maxCacheSize = ConfigConst.DEFAULT_MAX_CACHE_SIZE;
+
+    /**
+     * 缓存定时器检查间隔, 单位秒
+     */
+    private long timedCheckInterval = ConfigConst.DEFAULT_TIME_CACHE_CHECK_INTERVAL;
+
+    /**
+     * 是否开启重试
+     */
+    private boolean enableRetry = true;
+
+    /**
+     * 连接超时时间-restTemplate
+     */
+    private long restTemplateConnectTimeoutMs = ConfigConst.CONNECT_TIMEOUT_MS;
+
+    /**
+     * 响应超时时间-restTemplate
+     */
+    private long restTemplateReadTimeoutMs = ConfigConst.SOCKET_READ_TIMEOUT_MS;
+
+    /**
+     * rest template-请求协议, 默认okHttp， 若宿主没有则使用Connection模式
+     */
+    private String restTemplateRequestFactory = "okHttp";
+
+    public String getRestTemplateRequestFactory() {
+        return restTemplateRequestFactory;
+    }
+
+    public void setRestTemplateRequestFactory(String restTemplateRequestFactory) {
+        this.restTemplateRequestFactory = restTemplateRequestFactory;
+    }
+
+    public long getRestTemplateConnectTimeoutMs() {
+        return restTemplateConnectTimeoutMs;
+    }
+
+    public void setRestTemplateConnectTimeoutMs(long restTemplateConnectTimeoutMs) {
+        this.restTemplateConnectTimeoutMs = restTemplateConnectTimeoutMs;
+    }
+
+    public long getRestTemplateReadTimeoutMs() {
+        return restTemplateReadTimeoutMs;
+    }
+
+    public void setRestTemplateReadTimeoutMs(long restTemplateReadTimeoutMs) {
+        this.restTemplateReadTimeoutMs = restTemplateReadTimeoutMs;
+    }
+
+    public boolean isEnableRetry() {
+        return enableRetry;
+    }
+
+    public void setEnableRetry(boolean enableRetry) {
+        this.enableRetry = enableRetry;
+    }
+
+    public int getMaxCacheSize() {
+        return maxCacheSize;
+    }
+
+    public void setMaxCacheSize(int maxCacheSize) {
+        this.maxCacheSize = maxCacheSize;
+    }
+
+    public long getTimedCheckInterval() {
+        return timedCheckInterval;
+    }
+
+    public void setTimedCheckInterval(long timedCheckInterval) {
+        this.timedCheckInterval = timedCheckInterval;
+    }
+
     public String getRetryClusterInvoker() {
         return retryClusterInvoker;
     }
