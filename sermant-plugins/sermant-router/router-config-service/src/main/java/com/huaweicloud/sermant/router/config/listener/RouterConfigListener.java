@@ -81,6 +81,14 @@ public class RouterConfigListener implements DynamicConfigListener {
             if (CollectionUtils.isEmpty(list)) {
                 continue;
             }
+            for (Rule rule : list) {
+                // 去掉无效的规则
+                RuleUtils.removeInvalidRules(rule.getMatch());
+
+                // 去掉无效的路由
+                RuleUtils.removeInvalidRoute(rule.getRoute());
+            }
+            list.sort((o1, o2) -> o2.getPrecedence() - o1.getPrecedence());
             routeRule.put(entry.getKey(), list);
         }
         configuration.setRouteRule(routeRule);

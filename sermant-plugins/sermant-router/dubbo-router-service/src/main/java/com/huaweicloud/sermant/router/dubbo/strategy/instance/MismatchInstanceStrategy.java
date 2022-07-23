@@ -27,14 +27,14 @@ import java.util.Set;
 import java.util.function.Function;
 
 /**
- * 匹配不在notMatchVersions中的invoker
+ * 匹配不在mismatch中的invoker
  *
  * @author provenceee
  * @since 2021-12-08
  */
-public class NotMatchInstanceStrategy extends AbstractInstanceStrategy<Object> {
+public class MismatchInstanceStrategy extends AbstractInstanceStrategy<Object> {
     /**
-     * 匹配不在notMatchVersions中的invoker
+     * 匹配不在mismatch中的invoker
      *
      * @param invoker Invoker
      * @param tags 没有匹配上的标签
@@ -43,15 +43,15 @@ public class NotMatchInstanceStrategy extends AbstractInstanceStrategy<Object> {
     @Override
     public boolean isMatch(Object invoker, List<Map<String, String>> tags,
         Function<Object, Map<String, String>> mapper) {
-        // 由于由于notMatchTags里面的标签已经匹配过了且没有匹配上，所以要剔除掉，不能参与负载均衡，否则会导致流量比例不正确（会偏高）
+        // 由于由于mismatch里面的标签已经匹配过了且没有匹配上，所以要剔除掉，不能参与负载均衡，否则会导致流量比例不正确（会偏高）
         String invokerVersion = getMetadata(invoker, mapper)
             .getOrDefault(RouterConstant.TAG_VERSION_KEY, RouterConstant.ROUTER_DEFAULT_VERSION);
-        Set<String> notMatchVersions = new HashSet<>();
+        Set<String> mismatchVersions = new HashSet<>();
         for (Map<String, String> tag : tags) {
             if (StringUtils.isExist(tag.get(VERSION_KEY))) {
-                notMatchVersions.add(tag.get(VERSION_KEY));
+                mismatchVersions.add(tag.get(VERSION_KEY));
             }
         }
-        return !notMatchVersions.contains(invokerVersion);
+        return !mismatchVersions.contains(invokerVersion);
     }
 }

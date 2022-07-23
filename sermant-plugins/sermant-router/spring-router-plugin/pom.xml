@@ -14,7 +14,7 @@
     <properties>
         <package.plugin.type>plugin</package.plugin.type>
         <spring.cloud.version>2.2.5.RELEASE</spring.cloud.version>
-        <spring.version>4.3.6.RELEASE</spring.version>
+        <spring.version>5.2.0.RELEASE</spring.version>
         <feigin.version>9.5.0</feigin.version>
         <ribbon.version>2.2.5</ribbon.version>
         <eureka.version>1.10.7</eureka.version>

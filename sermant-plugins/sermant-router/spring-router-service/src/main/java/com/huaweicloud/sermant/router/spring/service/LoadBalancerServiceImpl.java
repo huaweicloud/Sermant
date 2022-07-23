@@ -41,11 +41,11 @@ public class LoadBalancerServiceImpl implements LoadBalancerService {
     public List<Object> getTargetInstances(String targetName, List<Object> serverList, String path,
         Map<String, List<String>> header) {
         RouterConfiguration configuration = LabelCache.getLabel(RouterConstant.SPRING_CACHE_NAME);
-        List<Rule> rules = RuleUtils.getValidRules(configuration, targetName, path, AppCache.INSTANCE.getAppName());
+        List<Rule> rules = RuleUtils.getRules(configuration, targetName, path, AppCache.INSTANCE.getAppName());
         List<Route> routes = RouteUtils.getRoutes(rules, header);
         if (!CollectionUtils.isEmpty(routes)) {
             return RuleStrategyHandler.INSTANCE.getTargetInstances(routes, serverList);
         }
-        return serverList;
+        return RuleStrategyHandler.INSTANCE.getMismatchInstances(RuleUtils.getTags(rules), serverList);
     }
 }

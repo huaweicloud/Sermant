@@ -19,29 +19,30 @@ package com.huaweicloud.sermant.router.spring.declarer;
 import com.huaweicloud.sermant.core.plugin.agent.matcher.ClassMatcher;
 
 /**
- * spring cloud loadbalancer CachingServiceInstanceListSupplier增强类，获取下游实例
+ * CachingServiceInstanceListSupplier/DiscoveryClientServiceInstanceListSupplier增强类，筛选下游实例
  *
  * @author provenceee
  * @since 2022-07-12
  */
-public class LoadBalancerDeclarer extends AbstractDeclarer {
-    private static final String ENHANCE_CLASS =
-        "org.springframework.cloud.loadbalancer.core.CachingServiceInstanceListSupplier";
+public class ServiceInstanceListSupplierDeclarer extends AbstractDeclarer {
+    private static final String[] ENHANCE_CLASS =
+        {"org.springframework.cloud.loadbalancer.core.CachingServiceInstanceListSupplier",
+            "org.springframework.cloud.loadbalancer.core.DiscoveryClientServiceInstanceListSupplier"};
 
     private static final String INTERCEPT_CLASS
-        = "com.huaweicloud.sermant.router.spring.interceptor.LoadBalancerInterceptor";
+        = "com.huaweicloud.sermant.router.spring.interceptor.ServiceInstanceListSupplierInterceptor";
 
     private static final String METHOD_NAME = "get";
 
     /**
      * 构造方法
      */
-    public LoadBalancerDeclarer() {
-        super(ENHANCE_CLASS, INTERCEPT_CLASS, METHOD_NAME);
+    public ServiceInstanceListSupplierDeclarer() {
+        super(null, INTERCEPT_CLASS, METHOD_NAME);
     }
 
     @Override
     public ClassMatcher getClassMatcher() {
-        return ClassMatcher.nameEquals(ENHANCE_CLASS);
+        return ClassMatcher.nameContains(ENHANCE_CLASS);
     }
 }

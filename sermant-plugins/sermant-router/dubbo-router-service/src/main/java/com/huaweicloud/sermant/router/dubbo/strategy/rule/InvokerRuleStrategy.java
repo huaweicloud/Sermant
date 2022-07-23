@@ -17,7 +17,7 @@
 package com.huaweicloud.sermant.router.dubbo.strategy.rule;
 
 import com.huaweicloud.sermant.router.config.strategy.AbstractRuleStrategy;
-import com.huaweicloud.sermant.router.dubbo.strategy.instance.NotMatchInstanceStrategy;
+import com.huaweicloud.sermant.router.dubbo.strategy.instance.MismatchInstanceStrategy;
 import com.huaweicloud.sermant.router.dubbo.strategy.instance.TargetInstanceStrategy;
 import com.huaweicloud.sermant.router.dubbo.utils.DubboReflectUtils;
 
@@ -32,7 +32,7 @@ public class InvokerRuleStrategy extends AbstractRuleStrategy<Object> {
      * 构造方法
      */
     public InvokerRuleStrategy() {
-        super(new TargetInstanceStrategy(), new NotMatchInstanceStrategy(),
+        super(new TargetInstanceStrategy(), new MismatchInstanceStrategy(),
             obj -> DubboReflectUtils.getParameters(DubboReflectUtils.getUrl(obj)));
     }
 }

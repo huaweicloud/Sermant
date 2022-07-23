@@ -26,15 +26,15 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * 匹配不在notMatchVersions中的实例
+ * 匹配不在mismatch中的实例
  *
  * @param <T> 泛型
  * @author provenceee
  * @since 2021-12-08
  */
-public class NotMatchInstanceStrategy<T> extends AbstractInstanceStrategy<T> {
+public class MismatchInstanceStrategy<T> extends AbstractInstanceStrategy<T> {
     /**
-     * 匹配不在notMatchVersions中的实例
+     * 匹配不在mismatch中的实例
      *
      * @param instance 实例
      * @param tags 没有匹配上的标签
@@ -43,10 +43,10 @@ public class NotMatchInstanceStrategy<T> extends AbstractInstanceStrategy<T> {
      */
     @Override
     public boolean isMatch(T instance, List<Map<String, String>> tags, Function<T, Map<String, String>> mapper) {
-        // 由于notMatchTags里面的标签已经匹配过了且没有匹配上，所以要剔除掉，不能参与负载均衡，否则会导致流量比例不正确（会偏高）
+        // 由于mismatch里面的标签已经匹配过了且没有匹配上，所以要剔除掉，不能参与负载均衡，否则会导致流量比例不正确（会偏高）
         Map<String, String> metadata = getMetadata(instance, mapper);
-        for (Map<String, String> notMatchTag : tags) {
-            for (Entry<String, String> entry : notMatchTag.entrySet()) {
+        for (Map<String, String> mismatchTag : tags) {
+            for (Entry<String, String> entry : mismatchTag.entrySet()) {
                 String key = entry.getKey();
                 if (VERSION_KEY.equals(entry.getKey())) {
                     key = RouterConstant.TAG_VERSION_KEY;

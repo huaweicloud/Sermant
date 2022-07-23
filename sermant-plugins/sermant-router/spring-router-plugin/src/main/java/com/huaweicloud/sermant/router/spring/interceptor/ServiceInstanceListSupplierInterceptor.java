@@ -19,6 +19,7 @@ package com.huaweicloud.sermant.router.spring.interceptor;
 import com.huaweicloud.sermant.core.plugin.agent.entity.ExecuteContext;
 import com.huaweicloud.sermant.core.plugin.agent.interceptor.AbstractInterceptor;
 import com.huaweicloud.sermant.core.service.ServiceManager;
+import com.huaweicloud.sermant.core.utils.StringUtils;
 import com.huaweicloud.sermant.router.common.constants.RouterConstant;
 import com.huaweicloud.sermant.router.common.utils.CollectionUtils;
 import com.huaweicloud.sermant.router.spring.cache.RequestData;
@@ -28,24 +29,26 @@ import com.huaweicloud.sermant.router.spring.utils.ThreadLocalUtils;
 
 import reactor.core.publisher.Flux;
 
-import org.springframework.cloud.loadbalancer.core.DelegatingServiceInstanceListSupplier;
+import org.springframework.cloud.loadbalancer.core.DiscoveryClientServiceInstanceListSupplier;
+import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
- * spring cloud loadbalancer CachingServiceInstanceListSupplier增强类，获取下游实例
+ * CachingServiceInstanceListSupplier/DiscoveryClientServiceInstanceListSupplier增强类，筛选下游实例
  *
  * @author provenceee
  * @since 2022-07-12
  */
-public class LoadBalancerInterceptor extends AbstractInterceptor {
+public class ServiceInstanceListSupplierInterceptor extends AbstractInterceptor {
     private final SpringConfigService configService;
     private final LoadBalancerService loadBalancerService;
 
     /**
      * 构造方法
      */
-    public LoadBalancerInterceptor() {
+    public ServiceInstanceListSupplierInterceptor() {
         configService = ServiceManager.getService(SpringConfigService.class);
         loadBalancerService = ServiceManager.getService(LoadBalancerService.class);
     }
@@ -60,14 +63,13 @@ public class LoadBalancerInterceptor extends AbstractInterceptor {
             return context;
         }
         Object object = context.getObject();
-        String serviceId = "";
-        if (object instanceof DelegatingServiceInstanceListSupplier) {
-            serviceId = ((DelegatingServiceInstanceListSupplier) object).getServiceId();
+        String serviceId = getServiceId(object).orElse(null);
+        if (StringUtils.isBlank(serviceId)) {
+            return context;
         }
         Object obj = context.getMemberFieldValue("serviceInstances");
         if (obj instanceof Flux<?>) {
-            Flux<List<Object>> flux = (Flux<List<Object>>) obj;
-            List<Object> instances = flux.next().block();
+            List<Object> instances = getInstances((Flux<Object>) obj, object);
             if (CollectionUtils.isEmpty(instances)) {
                 return context;
             }
@@ -81,5 +83,22 @@ public class LoadBalancerInterceptor extends AbstractInterceptor {
     @Override
     public ExecuteContext after(ExecuteContext context) {
         return context;
+    }
+
+    private Optional<String> getServiceId(Object object) {
+        if (object instanceof ServiceInstanceListSupplier) {
+            return Optional.ofNullable(((ServiceInstanceListSupplier) object).getServiceId());
+        }
+        return Optional.empty();
+    }
+
+    private List<Object> getInstances(Flux<Object> flux, Object object) {
+        if (object instanceof DiscoveryClientServiceInstanceListSupplier) {
+            if (flux.getClass().getName().contains("FluxFirstNonEmptyEmitting")) {
+                return flux.collectList().toProcessor().block();
+            }
+            return (List<Object>) flux.next().toProcessor().block();
+        }
+        return (List<Object>) flux.next().block();
     }
 }

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * 匹配不在notMatchVersions中的实例
+ * 匹配不在mismatch中的实例
  *
  * @param <T> 泛型
  * @author provenceee

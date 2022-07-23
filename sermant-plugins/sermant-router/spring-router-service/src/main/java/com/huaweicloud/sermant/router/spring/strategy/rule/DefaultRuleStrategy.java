@@ -17,7 +17,7 @@
 package com.huaweicloud.sermant.router.spring.strategy.rule;
 
 import com.huaweicloud.sermant.router.config.strategy.AbstractRuleStrategy;
-import com.huaweicloud.sermant.router.spring.strategy.instance.NotMatchInstanceStrategy;
+import com.huaweicloud.sermant.router.spring.strategy.instance.MismatchInstanceStrategy;
 import com.huaweicloud.sermant.router.spring.strategy.instance.TargetInstanceStrategy;
 import com.huaweicloud.sermant.router.spring.utils.SpringReflectUtils;
 
@@ -32,6 +32,6 @@ public class DefaultRuleStrategy extends AbstractRuleStrategy<Object> {
      * 构造方法
      */
     public DefaultRuleStrategy() {
-        super(new TargetInstanceStrategy<>(), new NotMatchInstanceStrategy<>(), SpringReflectUtils::getMetadata);
+        super(new TargetInstanceStrategy<>(), new MismatchInstanceStrategy<>(), SpringReflectUtils::getMetadata);
     }
 }

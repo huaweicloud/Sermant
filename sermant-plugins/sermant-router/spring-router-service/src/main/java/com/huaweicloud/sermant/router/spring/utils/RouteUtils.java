@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * 应用路由插件工具类
+ * 路由插件工具类
  *
  * @author provenceee
  * @since 2021-06-21

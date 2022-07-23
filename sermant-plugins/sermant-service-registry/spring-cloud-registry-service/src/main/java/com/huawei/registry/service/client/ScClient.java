@@ -463,7 +463,7 @@ public class ScClient {
         microservice.setVersion(registerConfig.getVersion());
         microservice.setServiceName(RegisterContext.INSTANCE.getClientInfo().getServiceId());
         microservice.setStatus(MicroserviceStatus.UP);
-        microservice.setProperties(registerConfig.getParameter());
+        microservice.setProperties(registerConfig.getParameterMap());
         return microservice;
     }
 

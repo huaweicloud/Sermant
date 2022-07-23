@@ -89,7 +89,7 @@ public class RuleStrategyHandlerTest {
      * 测试alibaba invoker未命中0.0.1版本实例的情况
      */
     @Test
-    public void testAlibabaNotMatch() {
+    public void testAlibabaMismatch() {
         List<Object> invokers = new ArrayList<>();
         AlibabaInvoker<Object> invoker1 = new AlibabaInvoker<>(8081, "0.0.1");
         invokers.add(invoker1);
@@ -121,7 +121,7 @@ public class RuleStrategyHandlerTest {
      * 测试apache invoker未命中0.0.1版本实例的情况
      */
     @Test
-    public void testApacheNotMatch() {
+    public void testApacheMismatch() {
         List<Object> invokers = new ArrayList<>();
         ApacheInvoker<Object> invoker1 = new ApacheInvoker<>(8081, "0.0.1");
         invokers.add(invoker1);

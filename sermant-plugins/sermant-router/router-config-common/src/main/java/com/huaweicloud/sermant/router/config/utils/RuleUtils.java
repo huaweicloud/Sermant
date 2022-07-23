@@ -49,7 +49,7 @@ public class RuleUtils {
     }
 
     /**
-     * 获取合法的目标规则
+     * 获取目标规则
      *
      * @param configuration 路由配置
      * @param targetService 目标服务
@@ -57,7 +57,7 @@ public class RuleUtils {
      * @param serviceName 本服务服务名
      * @return 目标规则
      */
-    public static List<Rule> getValidRules(RouterConfiguration configuration, String targetService, String path,
+    public static List<Rule> getRules(RouterConfiguration configuration, String targetService, String path,
         String serviceName) {
         if (RouterConfiguration.isInValid(configuration)) {
             return Collections.emptyList();
@@ -68,19 +68,30 @@ public class RuleUtils {
         }
         List<Rule> list = new ArrayList<>();
         for (Rule rule : routeRule.get(targetService)) {
-            if (isInvalidRule(rule, path, serviceName)) {
-                continue;
+            if (isTargetRule(rule, path, serviceName)) {
+                list.add(rule);
             }
-
-            // 去掉无效的规则
-            removeInvalidRules(rule.getMatch());
-
-            // 去掉无效的路由
-            removeInvalidRoute(rule.getRoute());
-            list.add(rule);
         }
-        list.sort((o1, o2) -> o2.getPrecedence() - o1.getPrecedence());
         return list;
+    }
+
+    /**
+     * 获取所有标签
+     *
+     * @param rules 路由规则
+     * @return 标签
+     */
+    public static List<Map<String, String>> getTags(List<Rule> rules) {
+        if (CollectionUtils.isEmpty(rules)) {
+            return Collections.emptyList();
+        }
+        List<Map<String, String>> tags = new ArrayList<>();
+        for (Rule rule : rules) {
+            for (Route route : rule.getRoute()) {
+                tags.add(route.getTags());
+            }
+        }
+        return tags;
     }
 
     /**
@@ -150,12 +161,26 @@ public class RuleUtils {
         return new RouteResult(isMatch, tags);
     }
 
-    private static void removeInvalidRules(Match match) {
+    /**
+     * 去掉无效的规则
+     *
+     * @param match 匹配规则
+     */
+    public static void removeInvalidRules(Match match) {
         if (match == null) {
             return;
         }
         removeInvalidMatchRule(match.getArgs());
         removeInvalidMatchRule(match.getHeaders());
+    }
+
+    /**
+     * 去掉无效的路由
+     *
+     * @param routeList 路由
+     */
+    public static void removeInvalidRoute(List<Route> routeList) {
+        routeList.removeIf(RuleUtils::isInvalidRoute);
     }
 
     private static void removeInvalidMatchRule(Map<String, List<MatchRule>> matchRuleMap) {
@@ -167,29 +192,22 @@ public class RuleUtils {
         }
     }
 
-    private static void removeInvalidRoute(List<Route> routeList) {
-        routeList.removeIf(RuleUtils::isInvalidRoute);
-    }
-
-    private static boolean isInvalidRule(Rule rule, String path, String serviceName) {
+    private static boolean isTargetRule(Rule rule, String path, String serviceName) {
         if (rule == null) {
-            return true;
+            return false;
         }
         Match match = rule.getMatch();
         if (match != null) {
             String source = match.getSource();
             if (StringUtils.isExist(source) && !source.equals(serviceName)) {
-                return true;
+                return false;
             }
             String matchPath = match.getPath();
             if (StringUtils.isExist(matchPath) && !Pattern.matches(matchPath, path)) {
-                return true;
-            }
-            if (CollectionUtils.isEmpty(match.getArgs()) && CollectionUtils.isEmpty(match.getHeaders())) {
-                return true;
+                return false;
             }
         }
-        return CollectionUtils.isEmpty(rule.getRoute());
+        return !CollectionUtils.isEmpty(rule.getRoute());
     }
 
     private static boolean isInvalidType(Entry<String, List<MatchRule>> entry) {

@@ -35,7 +35,7 @@ import java.util.function.Function;
  * @since 2021-10-14
  */
 public abstract class AbstractRuleStrategy<T> implements RuleStrategy<T> {
-    private final InstanceStrategy<T> notMatchInstanceStrategy;
+    private final InstanceStrategy<T> mismatchInstanceStrategy;
 
     private final InstanceStrategy<T> targetInstanceStrategy;
 
@@ -45,13 +45,13 @@ public abstract class AbstractRuleStrategy<T> implements RuleStrategy<T> {
      * 构造方法
      *
      * @param targetInstanceStrategy 目标策略
-     * @param notMatchInstanceStrategy 匹配不上的策略
+     * @param mismatchInstanceStrategy 匹配不上的策略
      * @param mapper 获取metadata的方法
      */
     public AbstractRuleStrategy(InstanceStrategy<T> targetInstanceStrategy,
-        InstanceStrategy<T> notMatchInstanceStrategy, Function<T, Map<String, String>> mapper) {
+        InstanceStrategy<T> mismatchInstanceStrategy, Function<T, Map<String, String>> mapper) {
         this.targetInstanceStrategy = targetInstanceStrategy;
-        this.notMatchInstanceStrategy = notMatchInstanceStrategy;
+        this.mismatchInstanceStrategy = mismatchInstanceStrategy;
         this.mapper = mapper;
     }
 
@@ -62,6 +62,17 @@ public abstract class AbstractRuleStrategy<T> implements RuleStrategy<T> {
         List<T> resultList = new ArrayList<>();
         for (T instance : instances) {
             if (instanceStrategy.isMatch(instance, result.getTags(), getMapper())) {
+                resultList.add(instance);
+            }
+        }
+        return CollectionUtils.isEmpty(resultList) ? instances : resultList;
+    }
+
+    @Override
+    public List<T> getMismatchInstances(List<Map<String, String>> tags, List<T> instances) {
+        List<T> resultList = new ArrayList<>();
+        for (T instance : instances) {
+            if (mismatchInstanceStrategy.isMatch(instance, tags, getMapper())) {
                 resultList.add(instance);
             }
         }
@@ -87,6 +98,6 @@ public abstract class AbstractRuleStrategy<T> implements RuleStrategy<T> {
     }
 
     private InstanceStrategy<T> getStrategy(boolean isMatch) {
-        return isMatch ? targetInstanceStrategy : notMatchInstanceStrategy;
+        return isMatch ? targetInstanceStrategy : mismatchInstanceStrategy;
     }
 }

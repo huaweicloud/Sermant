@@ -80,7 +80,7 @@ public class AbstractDirectoryServiceImpl implements AbstractDirectoryService {
         Object invocation = arguments[0];
         String interfaceName = serviceInterface + "." + DubboReflectUtils.getMethodName(invocation);
         String targetService = cache.getApplication(serviceInterface);
-        List<Rule> rules = RuleUtils.getValidRules(configuration, targetService, interfaceName, cache.getAppName());
+        List<Rule> rules = RuleUtils.getRules(configuration, targetService, interfaceName, cache.getAppName());
         List<Route> routes = RouteUtils.getRoutes(rules, DubboReflectUtils.getArguments(invocation));
         if (CollectionUtils.isEmpty(routes)) {
             return result;

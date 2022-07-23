@@ -19,6 +19,7 @@ package com.huaweicloud.sermant.router.config.strategy;
 import com.huaweicloud.sermant.router.config.label.entity.Route;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 路由策略
@@ -36,4 +37,13 @@ public interface RuleStrategy<T> {
      * @return 路由过滤后的实例
      */
     List<T> getTargetInstances(List<Route> routes, List<T> instances);
+
+    /**
+     * 选取不匹配标签的实例
+     *
+     * @param tags 标签
+     * @param instances 实例列表
+     * @return 路由过滤后的实例
+     */
+    List<T> getMismatchInstances(List<Map<String, String>> tags, List<T> instances);
 }

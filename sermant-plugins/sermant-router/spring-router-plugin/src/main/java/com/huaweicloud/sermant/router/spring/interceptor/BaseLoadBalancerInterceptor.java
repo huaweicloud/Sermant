@@ -41,7 +41,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Ribbon BaseLoadBalancer负载均衡增强类，获取下游实例
+ * Ribbon BaseLoadBalancer负载均衡增强类，筛选下游实例
  *
  * @author provenceee
  * @since 2022-07-12
@@ -98,6 +98,9 @@ public class BaseLoadBalancerInterceptor extends AbstractInterceptor {
         if (requestData != null) {
             return Optional.of(requestData);
         }
+        if (!canLoadZuul()) {
+            return Optional.empty();
+        }
         RequestContext context = RequestContext.getCurrentContext();
         if (context == null) {
             return Optional.empty();
@@ -121,5 +124,14 @@ public class BaseLoadBalancerInterceptor extends AbstractInterceptor {
             list.add((String) enumeration.nextElement());
         }
         return list;
+    }
+
+    private boolean canLoadZuul() {
+        try {
+            Class.forName(RequestContext.class.getCanonicalName());
+        } catch (NoClassDefFoundError | ClassNotFoundException error) {
+            return false;
+        }
+        return true;
     }
 }

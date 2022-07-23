@@ -17,41 +17,31 @@
 package com.huaweicloud.sermant.router.spring.declarer;
 
 import com.huaweicloud.sermant.core.plugin.agent.matcher.ClassMatcher;
-import com.huaweicloud.sermant.core.plugin.agent.matcher.MethodMatcher;
 
 /**
- * Ribbon BaseLoadBalancer负载均衡增强类，筛选下游实例
+ * spring cloud gateway LoadBalancerClientFilter增强类，获取请求数据
  *
  * @author provenceee
  * @since 2022-07-12
  */
-public class BaseLoadBalancerDeclarer extends AbstractDeclarer {
-    private static final String ENHANCE_CLASS = "com.netflix.loadbalancer.BaseLoadBalancer";
+public class LoadBalancerClientFilterDeclarer extends AbstractDeclarer {
+    private static final String[] ENHANCE_CLASS = {"org.springframework.cloud.gateway.filter.LoadBalancerClientFilter",
+        "org.springframework.cloud.gateway.filter.ReactiveLoadBalancerClientFilter"};
 
     private static final String INTERCEPT_CLASS
-        = "com.huaweicloud.sermant.router.spring.interceptor.BaseLoadBalancerInterceptor";
+        = "com.huaweicloud.sermant.router.spring.interceptor.LoadBalancerClientFilterInterceptor";
 
-    private static final String[] METHOD_NAME = {"getReachableServers", "getAllServers"};
+    private static final String METHOD_NAME = "filter";
 
     /**
      * 构造方法
      */
-    public BaseLoadBalancerDeclarer() {
-        super(ENHANCE_CLASS, INTERCEPT_CLASS, null);
+    public LoadBalancerClientFilterDeclarer() {
+        super(null, INTERCEPT_CLASS, METHOD_NAME);
     }
 
     @Override
     public ClassMatcher getClassMatcher() {
-        return ClassMatcher.nameEquals(ENHANCE_CLASS);
-    }
-
-    /**
-     * 获取方法匹配器
-     *
-     * @return 方法匹配器
-     */
-    @Override
-    public MethodMatcher getMethodMatcher() {
-        return MethodMatcher.nameContains(METHOD_NAME);
+        return ClassMatcher.nameContains(ENHANCE_CLASS);
     }
 }

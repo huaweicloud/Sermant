@@ -67,6 +67,17 @@ public enum RuleStrategyHandler {
         return choose(instances.get(0)).getTargetInstances(routes, instances);
     }
 
+    /**
+     * 选取不匹配标签的实例
+     *
+     * @param tags 标签
+     * @param instances 实例列表
+     * @return 路由过滤后的实例
+     */
+    public List<Object> getMismatchInstances(List<Map<String, String>> tags, List<Object> instances) {
+        return choose(instances.get(0)).getMismatchInstances(tags, instances);
+    }
+
     private RuleStrategy<Object> choose(Object obj) {
         return map.getOrDefault(obj.getClass().getCanonicalName(), defaultStrategy);
     }
