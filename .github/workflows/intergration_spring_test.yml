@@ -1,0 +1,173 @@
+name: intergration spring test
+env:
+  projectSpringBootVersion: 2.2.0.RELEASE
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+      - develop
+jobs:
+  test-for-spring-nacos-config:
+    name: Test for spring nacos config
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - nacosVersion: "1.5.0.RELEASE"
+            springBootVersion: "1.5.0.RELEASE"
+            springCloudVersion: "Edgware.SR6"
+          - nacosVersion: "2.0.0.RELEASE"
+            springBootVersion: "2.0.0.RELEASE"
+            springCloudVersion: "Finchley.RELEASE"
+          - nacosVersion: "2.1.0.RELEASE"
+            springBootVersion: "2.1.0.RELEASE"
+            springCloudVersion: "Finchley.RELEASE"
+          - nacosVersion: "2.2.0.RELEASE"
+            springBootVersion: "2.2.0.RELEASE"
+            springCloudVersion: "Hoxton.RELEASE"
+          - nacosVersion: "2.2.8.RELEASE"
+            springBootVersion: "2.3.0.RELEASE"
+            springCloudVersion: "Hoxton.RELEASE"
+          - nacosVersion: "2021.0.1.0"
+            springBootVersion: "2.4.0"
+            springCloudVersion: "2020.0.0"
+          - nacosVersion: "2021.1"
+            springBootVersion: "2.6.2"
+            springCloudVersion: "2021.0.0"
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          cache: maven
+      - name: download nacos server and run
+        run: |
+          curl -o nacos-server-1.4.2.tar.gz -L https://github.com/alibaba/nacos/releases/download/1.4.2/nacos-server-1.4.2.tar.gz
+          tar -zxf nacos-server-1.4.2.tar.gz
+          bash nacos/bin/startup.sh -m standalone
+      - name: download localcse and run
+        run: |
+          curl -o Local-CSE-2.1.3-linux-amd64.zip -L https://cse-bucket.obs.cn-north-1.myhuaweicloud.com/LocalCSE/Local-CSE-2.1.3-linux-amd64.zip
+          unzip Local-CSE-2.1.3-linux-amd64.zip -d cse
+          sh cse/start.sh &
+      - name: package agent
+        run: mvn package -DskipTests -Pagent --file pom.xml
+      - name: package spring nacos config
+        run: |
+          sed -i 's|<version>${{ env.projectSpringBootVersion }}</version>|<version>${{ matrix.springBootVersion }}</version>|g' sermant-integration-tests/spring-test/pom.xml
+          mvn package -Dspring.cloud.version=${{ matrix.springCloudVersion }} -Dspring.boot.version=${{ matrix.springBootVersion }} -Dnacos.version=${{ matrix.nacosVersion }} -DskipTests -P dynamic-config-nacos --file sermant-integration-tests/spring-test/pom.xml
+      - name: start service with disable origin config center
+        env:
+          dynamic.config.serverAddress: 127.0.0.1:30110
+          dynamic.config.dynamicConfigType: KIE
+          dynamic.config.plugin.enableOriginConfigCenter: false
+          dynamic.config.plugin.enableDynamicConfig: true
+          server.port: 8989
+        run: |
+          nohup java -javaagent:sermant-agent-1.0.0/agent/sermant-agent.jar=appName=default -Dspring.cloud.bootstrap.enabled=true -jar sermant-integration-tests/spring-test/spring-nacos-config/target/nacos-config.jar > nacos-config.log 2>&1 &
+      - name: waiting for services start
+        run: |
+          ps -ef | grep java
+          sleep 20
+          curl http://127.0.0.1:8989/dynamic/config/check
+      - name: integration test
+        run: mvn test -Ddynamic.config.test.type=nacos --file sermant-integration-tests/spring-test/pom.xml
+      - name: start service with enable origin config center
+        env:
+          dynamic.config.serverAddress: 127.0.0.1:30110
+          dynamic.config.dynamicConfigType: KIE
+          dynamic.config.plugin.enableOriginConfigCenter: true
+          dynamic.config.plugin.enableDynamicConfig: true
+          server.port: 8989
+        run: |
+          ps -ef | grep nacos-config | head -n 1 | awk '{print $2}' | xargs -n 1 kill -9
+          sh cse/stop.sh
+          rm -rf cse/data
+          sh cse/start.sh &
+          nohup java -javaagent:sermant-agent-1.0.0/agent/sermant-agent.jar=appName=default -Dspring.cloud.bootstrap.enabled=true -jar sermant-integration-tests/spring-test/spring-nacos-config/target/nacos-config.jar &
+      - name: wait for ready and test
+        run: |
+          sleep 20
+          mvn test -Ddynamic.config.test.type=nacos --file sermant-integration-tests/spring-test/pom.xml
+  test-for-spring-zk-config:
+    name: Test for spring zk config
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - springBootVersion: "1.5.0.RELEASE"
+            springCloudVersion: "Edgware.SR6"
+          - springBootVersion: "2.0.0.RELEASE"
+            springCloudVersion: "Finchley.RELEASE"
+          - springBootVersion: "2.1.0.RELEASE"
+            springCloudVersion: "Finchley.RELEASE"
+          - springBootVersion: "2.2.0.RELEASE"
+            springCloudVersion: "Hoxton.RELEASE"
+          - springBootVersion: "2.3.0.RELEASE"
+            springCloudVersion: "Hoxton.RELEASE"
+          - springBootVersion: "2.4.0"
+            springCloudVersion: "2020.0.0"
+          - springBootVersion: "2.6.2"
+            springCloudVersion: "2021.0.0"
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'adopt'
+          cache: maven
+      - name: download zookeeper and run
+        run: |
+          curl -o apache-zookeeper-3.6.3-bin.tar.gz -L https://dlcdn.apache.org/zookeeper/zookeeper-3.6.3/apache-zookeeper-3.6.3-bin.tar.gz
+          tar -zxf apache-zookeeper-3.6.3-bin.tar.gz
+          bash apache-zookeeper-3.6.3-bin/bin/zkServer.sh start apache-zookeeper-3.6.3-bin/conf/zoo_sample.cfg
+      - name: download localcse and run
+        run: |
+          curl -o Local-CSE-2.1.3-linux-amd64.zip -L https://cse-bucket.obs.cn-north-1.myhuaweicloud.com/LocalCSE/Local-CSE-2.1.3-linux-amd64.zip
+          unzip Local-CSE-2.1.3-linux-amd64.zip -d cse
+          sh cse/start.sh &
+      - name: package agent
+        run: mvn package -DskipTests -Pagent --file pom.xml
+      - name: package spring zk config
+        run: |
+          sed -i 's|<version>${{ env.projectSpringBootVersion }}</version>|<version>${{ matrix.springBootVersion }}</version>|g' sermant-integration-tests/spring-test/pom.xml
+          mvn package -Dspring.cloud.version=${{ matrix.springCloudVersion }} -Dspring.boot.version=${{ matrix.springBootVersion }} -DskipTests -P dynamic-config-zk --file sermant-integration-tests/spring-test/pom.xml
+      - name: start service with disable origin config center
+        env:
+          dynamic.config.serverAddress: 127.0.0.1:30110
+          dynamic.config.dynamicConfigType: KIE
+          dynamic.config.plugin.enableOriginConfigCenter: false
+          dynamic.config.plugin.enableDynamicConfig: true
+          server.port: 8989
+        run: |
+          nohup java -javaagent:sermant-agent-1.0.0/agent/sermant-agent.jar=appName=default -Dspring.cloud.bootstrap.enabled=true -jar sermant-integration-tests/spring-test/spring-zookeeper-config/target/zookeeper-config.jar > zk.log 2>&1 &
+      - name: waiting for services start
+        run: |
+          ps -ef | grep java
+          sleep 20
+          curl http://127.0.0.1:8989/dynamic/config/check
+      - name: integration test
+        run: mvn test -Ddynamic.config.test.type=zk --file sermant-integration-tests/spring-test/pom.xml
+      - name: start service with enable origin config center
+        env:
+          dynamic.config.serverAddress: 127.0.0.1:30110
+          dynamic.config.dynamicConfigType: KIE
+          dynamic.config.plugin.enableOriginConfigCenter: true
+          dynamic.config.plugin.enableDynamicConfig: true
+          server.port: 8989
+        run: |
+          ps -ef | grep zookeeper-config | head -n 1 | awk '{print $2}' | xargs -n 1 kill -9
+          sh cse/stop.sh
+          rm -rf cse/data
+          sh cse/start.sh &
+          nohup java -javaagent:sermant-agent-1.0.0/agent/sermant-agent.jar=appName=default -Dspring.cloud.bootstrap.enabled=true -jar sermant-integration-tests/spring-test/spring-zookeeper-config/target/zookeeper-config.jar > zk-config.log 2>&1 &
+      - name: wait for ready and test
+        run: |
+          sleep 20
+          mvn test -Ddynamic.config.test.type=zk --file sermant-integration-tests/spring-test/pom.xml

@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: nacos-dynamic-config
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+server:
+  port: 8989
