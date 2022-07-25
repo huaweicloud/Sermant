@@ -17,7 +17,7 @@
 
 package com.huawei.flowcontrol.config;
 
-import com.huawei.flowcontrol.common.adapte.cse.entity.CseServiceMeta;
+import com.huawei.flowcontrol.common.adapte.cse.entity.FlowControlServiceMeta;
 import com.huawei.flowcontrol.common.config.FlowControlConfig;
 
 import com.huaweicloud.sermant.core.plugin.agent.entity.ExecuteContext;
@@ -36,7 +36,7 @@ public class DubboServiceNameInterceptor extends AbstractInterceptor {
         if (!PluginConfigManager.getPluginConfig(FlowControlConfig.class).isUseCseRule()) {
             return context;
         }
-        CseServiceMeta.getInstance().setServiceName((String) context.getArguments()[0]);
+        FlowControlServiceMeta.getInstance().setServiceName((String) context.getArguments()[0]);
         return context;
     }
 

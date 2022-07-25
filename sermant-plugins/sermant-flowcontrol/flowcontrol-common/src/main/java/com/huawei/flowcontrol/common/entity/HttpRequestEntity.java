@@ -19,6 +19,7 @@ package com.huawei.flowcontrol.common.entity;
 
 import com.huawei.flowcontrol.common.util.FilterUtil;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -39,53 +40,16 @@ public class HttpRequestEntity extends AbstractRequestEntity {
     private String method;
 
     /**
-     * http请求构造
-     *
-     * @param pathInfo 路径信息
-     * @param servletPath 请求路径
-     * @param headers 请求头
-     * @param method 方法类型
-     */
-    public HttpRequestEntity(String pathInfo, String servletPath, Map<String, String> headers, String method) {
-        this.pathInfo = pathInfo;
-        this.servletPath = servletPath;
-        this.headers = headers;
-        this.method = method;
-        this.apiPath = FilterUtil.filterTarget(pathInfo, servletPath);
-    }
-
-    /**
-     * http请求构造
-     *
-     * @param apiPath 请求路径
-     * @param headers 请求头
-     * @param method 方法类型
-     */
-    public HttpRequestEntity(String apiPath, Map<String, String> headers, String method) {
-        this.headers = headers;
-        this.method = method;
-        this.apiPath = apiPath;
-    }
-
-    /**
      * 空请求构造
      */
     public HttpRequestEntity() {
     }
 
-    public String getPathInfo() {
-        return pathInfo;
-    }
-
-    public void setPathInfo(String pathInfo) {
+    private void setPathInfo(String pathInfo) {
         this.pathInfo = pathInfo;
     }
 
-    public String getServletPath() {
-        return servletPath;
-    }
-
-    public void setServletPath(String servletPath) {
+    private void setServletPath(String servletPath) {
         this.servletPath = servletPath;
     }
 
@@ -99,7 +63,7 @@ public class HttpRequestEntity extends AbstractRequestEntity {
         return headers;
     }
 
-    public void setHeaders(Map<String, String> headers) {
+    private void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
@@ -108,7 +72,118 @@ public class HttpRequestEntity extends AbstractRequestEntity {
         return method;
     }
 
-    public void setMethod(String method) {
+    private void setMethod(String method) {
         this.method = method;
+    }
+
+    /**
+     * 构建器
+     *
+     * @since 2022-07-20
+     */
+    public static class Builder {
+        private final HttpRequestEntity httpRequestEntity;
+
+        /**
+         * 构建器
+         */
+        public Builder() {
+            httpRequestEntity = new HttpRequestEntity();
+        }
+
+        /**
+         * 设置服务名
+         *
+         * @param serviceName 服务名
+         * @return Builder
+         */
+        public Builder setServiceName(String serviceName) {
+            this.httpRequestEntity.setServiceName(serviceName);
+            return this;
+        }
+
+        /**
+         * 设置路径信息
+         *
+         * @param pathInfo 路径
+         * @return Builder
+         */
+        public Builder setPathInfo(String pathInfo) {
+            this.httpRequestEntity.setPathInfo(pathInfo);
+            return this;
+        }
+
+        /**
+         * 设置请求路径
+         *
+         * @param servletPath 请求路径
+         * @return Builder
+         */
+        public Builder setServletPath(String servletPath) {
+            this.httpRequestEntity.setServletPath(servletPath);
+            return this;
+        }
+
+        /**
+         * 设置请求头
+         *
+         * @param headers 请求头
+         * @return Builder
+         */
+        public Builder setHeaders(Map<String, String> headers) {
+            this.httpRequestEntity.setHeaders(Collections.unmodifiableMap(headers));
+            return this;
+        }
+
+        /**
+         * 设置方法类型
+         *
+         * @param method 反复
+         * @return Builder
+         */
+        public Builder setMethod(String method) {
+            this.httpRequestEntity.setMethod(method);
+            return this;
+        }
+
+        /**
+         * 设置请求方向
+         *
+         * @param requestType 请求方向
+         * @return Builder
+         */
+        public Builder setRequestType(RequestType requestType) {
+            this.httpRequestEntity.setRequestType(requestType);
+            return this;
+        }
+
+        /**
+         * 设置api
+         *
+         * @param apiPath api
+         * @return Builder
+         */
+        public Builder setApiPath(String apiPath) {
+            this.httpRequestEntity.apiPath = apiPath;
+            return this;
+        }
+
+        /**
+         * 返回构建的请求
+         *
+         * @return HttpRequestEntity
+         * @throws IllegalArgumentException 参数异常抛出
+         */
+        public HttpRequestEntity build() {
+            if (httpRequestEntity.apiPath == null) {
+                if (httpRequestEntity.servletPath == null && httpRequestEntity.pathInfo == null) {
+                    throw new IllegalArgumentException("Can not config request apiPath!");
+                } else {
+                    this.httpRequestEntity.apiPath = FilterUtil.filterTarget(httpRequestEntity.pathInfo,
+                            httpRequestEntity.servletPath);
+                }
+            }
+            return this.httpRequestEntity;
+        }
     }
 }

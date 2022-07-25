@@ -19,7 +19,7 @@ package com.huawei.flowcontrol.inject;
 
 import com.huawei.flowcontrol.common.adapte.cse.ResolverManager;
 import com.huawei.flowcontrol.common.adapte.cse.constants.CseConstants;
-import com.huawei.flowcontrol.common.adapte.cse.entity.CseServiceMeta;
+import com.huawei.flowcontrol.common.adapte.cse.entity.FlowControlServiceMeta;
 import com.huawei.flowcontrol.common.config.FlowControlConfig;
 
 import com.huaweicloud.sermant.core.plugin.config.PluginConfigManager;
@@ -66,23 +66,26 @@ public class FlowControlSpringConfiguration {
     }
 
     private void initConfig() {
-        if (CseServiceMeta.getInstance().isDubboService()) {
+        if (FlowControlServiceMeta.getInstance().isDubboService()) {
             return;
         }
         final FlowControlConfig pluginConfig = PluginConfigManager.getPluginConfig(FlowControlConfig.class);
         if (pluginConfig.isUseCseRule() && pluginConfig.isBaseSdk()) {
-            CseServiceMeta.getInstance().setProject(environment.getProperty(CseConstants.KEY_SPRING_KIE_PROJECT,
+            FlowControlServiceMeta.getInstance().setProject(environment.getProperty(CseConstants.KEY_SPRING_KIE_PROJECT,
                     CseConstants.DEFAULT_PROJECT));
-            CseServiceMeta.getInstance().setServiceName(environment.getProperty(CseConstants.KEY_SPRING_SERVICE_NAME));
-            CseServiceMeta.getInstance().setEnvironment(environment.getProperty(CseConstants.KEY_SPRING_ENVIRONMENT));
-            CseServiceMeta.getInstance().setApp(environment.getProperty(CseConstants.KEY_SPRING_APP_NAME));
-            CseServiceMeta.getInstance().setCustomLabel(environment.getProperty(CseConstants.KEY_SPRING_CUSTOM_LABEL,
+            FlowControlServiceMeta.getInstance().setServiceName(environment.getProperty(
+                    CseConstants.KEY_SPRING_SERVICE_NAME));
+            FlowControlServiceMeta.getInstance().setEnvironment(environment.getProperty(
+                    CseConstants.KEY_SPRING_ENVIRONMENT));
+            FlowControlServiceMeta.getInstance().setApp(environment.getProperty(CseConstants.KEY_SPRING_APP_NAME));
+            FlowControlServiceMeta.getInstance().setCustomLabel(environment.getProperty(
+                    CseConstants.KEY_SPRING_CUSTOM_LABEL,
                     CseConstants.DEFAULT_CUSTOM_LABEL));
-            CseServiceMeta.getInstance().setCustomLabelValue(environment.getProperty(
+            FlowControlServiceMeta.getInstance().setCustomLabelValue(environment.getProperty(
                     CseConstants.KEY_SPRING_CUSTOM_LABEL_VALUE, CseConstants.DEFAULT_CUSTOM_LABEL_VALUE));
-            CseServiceMeta.getInstance().setVersion(environment.getProperty(CseConstants.KEY_SPRING_VERSION));
+            FlowControlServiceMeta.getInstance().setVersion(environment.getProperty(CseConstants.KEY_SPRING_VERSION));
         } else {
-            CseServiceMeta.getInstance().setServiceName(serviceName);
+            FlowControlServiceMeta.getInstance().setServiceName(serviceName);
         }
     }
 

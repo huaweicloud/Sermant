@@ -17,7 +17,10 @@
 
 package com.huawei.flowcontrol.common.entity;
 
+import com.huawei.flowcontrol.common.entity.RequestEntity.RequestType;
 import com.huawei.flowcontrol.common.enums.FlowControlEnum;
+
+import java.util.Locale;
 
 /**
  * 修正结果, 该结果确定返回数据
@@ -36,6 +39,11 @@ public class FlowControlResult {
      */
     private boolean isSkip = false;
 
+    /**
+     * 请求方向
+     */
+    private RequestType requestType;
+
     public FlowControlEnum getResult() {
         return flowControlEnum;
     }
@@ -50,11 +58,31 @@ public class FlowControlResult {
         this.isSkip = true;
     }
 
+    /**
+     * 构建响应提示, requestType:flowcontrolEnum
+     *
+     * @return 响应信息
+     */
+    public String buildResponseMsg() {
+        if (requestType == null || flowControlEnum == null) {
+            return "";
+        }
+        return String.format(Locale.ENGLISH, "%s throw exception: %s", requestType, flowControlEnum.getMsg());
+    }
+
     public boolean isSkip() {
         return isSkip;
     }
 
     public void setSkip(boolean isNeedSkip) {
         this.isSkip = isNeedSkip;
+    }
+
+    public RequestType getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(RequestType requestType) {
+        this.requestType = requestType;
     }
 }

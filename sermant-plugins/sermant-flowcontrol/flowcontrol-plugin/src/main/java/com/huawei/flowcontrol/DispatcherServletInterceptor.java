@@ -16,9 +16,10 @@
 
 package com.huawei.flowcontrol;
 
-import com.huawei.flowcontrol.common.config.CommonConst;
+import com.huawei.flowcontrol.common.adapte.cse.entity.FlowControlServiceMeta;
 import com.huawei.flowcontrol.common.entity.FlowControlResult;
 import com.huawei.flowcontrol.common.entity.HttpRequestEntity;
+import com.huawei.flowcontrol.common.entity.RequestEntity.RequestType;
 import com.huawei.flowcontrol.service.InterceptorSupporter;
 
 import com.huaweicloud.sermant.core.plugin.agent.entity.ExecuteContext;
@@ -39,6 +40,8 @@ import javax.servlet.http.HttpServletResponse;
  * @since 2022-02-11
  */
 public class DispatcherServletInterceptor extends InterceptorSupporter {
+    private final String className = DispatcherServletInterceptor.class.getName();
+
     /**
      * http请求数据转换 适应plugin -> service数据传递 注意，该方法不可抽出，由于宿主依赖仅可由该拦截器加载，因此抽出会导致找不到类
      *
@@ -49,8 +52,14 @@ public class DispatcherServletInterceptor extends InterceptorSupporter {
         if (request == null) {
             return Optional.empty();
         }
-        return Optional.of(new HttpRequestEntity(request.getPathInfo(), request.getRequestURI(),
-            getHeaders(request), request.getMethod()));
+        return Optional.of(new HttpRequestEntity.Builder()
+                .setRequestType(RequestType.SERVER)
+                .setPathInfo(request.getPathInfo())
+                .setServletPath(request.getRequestURI())
+                .setHeaders(getHeaders(request))
+                .setMethod(request.getMethod())
+                .setServiceName(FlowControlServiceMeta.getInstance().getServiceName())
+                .build());
     }
 
     /**
@@ -78,13 +87,13 @@ public class DispatcherServletInterceptor extends InterceptorSupporter {
         if (!httpRequestEntity.isPresent()) {
             return context;
         }
-        chooseHttpService().onBefore(httpRequestEntity.get(), result);
+        chooseHttpService().onBefore(className, httpRequestEntity.get(), result);
         if (result.isSkip()) {
             context.skip(null);
             final HttpServletResponse response = (HttpServletResponse) allArguments[1];
             if (response != null) {
-                response.setStatus(CommonConst.TOO_MANY_REQUEST_CODE);
-                response.getWriter().print(result.getResult().getMsg());
+                response.setStatus(result.getResult().getCode());
+                response.getWriter().print(result.buildResponseMsg());
             }
         }
         return context;
@@ -92,13 +101,13 @@ public class DispatcherServletInterceptor extends InterceptorSupporter {
 
     @Override
     protected final ExecuteContext doAfter(ExecuteContext context) {
-        chooseHttpService().onAfter(context.getResult());
+        chooseHttpService().onAfter(className, context.getResult());
         return context;
     }
 
     @Override
     protected final ExecuteContext doThrow(ExecuteContext context) {
-        chooseHttpService().onThrow(context.getThrowable());
+        chooseHttpService().onThrow(className, context.getThrowable());
         return context;
     }
 }

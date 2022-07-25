@@ -17,7 +17,7 @@
 package com.huawei.flowcontrol.common.adapte.cse.resolver;
 
 import com.huawei.flowcontrol.common.adapte.cse.constants.CseConstants;
-import com.huawei.flowcontrol.common.adapte.cse.entity.CseServiceMeta;
+import com.huawei.flowcontrol.common.adapte.cse.entity.FlowControlServiceMeta;
 import com.huawei.flowcontrol.common.adapte.cse.resolver.listener.ConfigUpdateListener;
 import com.huawei.flowcontrol.common.adapte.cse.rule.Configurable;
 import com.huawei.flowcontrol.common.util.StringUtils;
@@ -197,14 +197,14 @@ public abstract class AbstractResolver<T extends Configurable> {
 
             // 服务名匹配
             if (serviceAndVersion.length == 1 && serviceAndVersion[0]
-                .equals(CseServiceMeta.getInstance().getServiceName())) {
+                .equals(FlowControlServiceMeta.getInstance().getServiceName())) {
                 return true;
             }
 
             // 服务加版本匹配
             if (serviceAndVersion.length == CseConstants.SERVICE_VERSION_PARTS && serviceAndVersion[0]
-                .equals(CseServiceMeta.getInstance().getServiceName())
-                && serviceAndVersion[1].equals(CseServiceMeta.getInstance().getVersion())) {
+                .equals(FlowControlServiceMeta.getInstance().getServiceName())
+                && serviceAndVersion[1].equals(FlowControlServiceMeta.getInstance().getVersion())) {
                 return true;
             }
         }

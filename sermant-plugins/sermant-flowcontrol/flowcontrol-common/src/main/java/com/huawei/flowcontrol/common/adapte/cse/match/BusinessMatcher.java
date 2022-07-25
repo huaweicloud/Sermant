@@ -23,9 +23,9 @@
 package com.huawei.flowcontrol.common.adapte.cse.match;
 
 import com.huawei.flowcontrol.common.adapte.cse.rule.Configurable;
+import com.huawei.flowcontrol.common.entity.RequestEntity;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 业务场景匹配
@@ -72,14 +72,12 @@ public class BusinessMatcher extends Configurable implements Matcher {
      *
      * 匹配规则如下: 有一个业务场景匹配，即匹配成功
      *
-     * @param url 请求地址
-     * @param headers 请求头
-     * @param method 请求方法
+     * @param requestEntity 请求体
      * @return 是否匹配
      */
     @Override
-    public boolean match(String url, Map<String, String> headers, String method) {
-        if (method == null) {
+    public boolean match(RequestEntity requestEntity) {
+        if (requestEntity.getMethod() == null) {
             return false;
         }
         if (matches == null) {
@@ -87,7 +85,7 @@ public class BusinessMatcher extends Configurable implements Matcher {
         }
         for (RequestMatcher matcher : matches) {
             // 有一个场景匹配成功，则满足要求
-            if (matcher.match(url, headers, method)) {
+            if (matcher.match(requestEntity)) {
                 return true;
             }
         }

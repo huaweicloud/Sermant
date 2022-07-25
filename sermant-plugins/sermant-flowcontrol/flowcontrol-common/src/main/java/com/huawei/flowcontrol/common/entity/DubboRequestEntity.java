@@ -17,6 +17,7 @@
 
 package com.huawei.flowcontrol.common.entity;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -40,10 +41,15 @@ public class DubboRequestEntity extends AbstractRequestEntity {
      *
      * @param apiPath 请求路径
      * @param attachments 额外参数
+     * @param requestType 请求类型
+     * @param serviceName 服务名
      */
-    public DubboRequestEntity(String apiPath, Map<String, String> attachments) {
+    public DubboRequestEntity(String apiPath, Map<String, String> attachments, RequestType requestType,
+            String serviceName) {
         this.apiPath = apiPath;
-        this.attachments = attachments;
+        this.attachments = Collections.unmodifiableMap(attachments);
+        setRequestType(requestType);
+        setServiceName(serviceName);
     }
 
     @Override

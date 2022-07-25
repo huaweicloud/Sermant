@@ -25,6 +25,22 @@ package com.huawei.flowcontrol.common.config;
  */
 public class CommonConst {
     /**
+     * dubbo从url中获取下游服务名
+     *
+     * @see org.apache.dubbo.common.URL#getParameter(String)
+     * @see com.alibaba.dubbo.common.URL#getParameter(String)
+     */
+    public static final String DUBBO_REMOTE_APPLICATION = "remote.application";
+
+    /**
+     * dubbo从url中获取当前服务名
+     *
+     * @see org.apache.dubbo.common.URL#getParameter(String)
+     * @see com.alibaba.dubbo.common.URL#getParameter(String)
+     */
+    public static final String DUBBO_APPLICATION = "application";
+
+    /**
      * 从url获取的版本键名
      */
     public static final String URL_VERSION_KEY = "version";
@@ -98,6 +114,11 @@ public class CommonConst {
      * HTTP太多请求异常码
      */
     public static final int TOO_MANY_REQUEST_CODE = 429;
+
+    /**
+     * 实例隔离状态码
+     */
+    public static final int INSTANCE_ISOLATION_REQUEST_CODE = 503;
 
     /**
      * 周期性执行线程池名称

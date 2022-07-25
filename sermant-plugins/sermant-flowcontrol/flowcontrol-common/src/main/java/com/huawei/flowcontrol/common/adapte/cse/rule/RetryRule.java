@@ -117,9 +117,22 @@ public class RetryRule extends AbstractRule {
      */
     private double randomizationFactor = DEFAULT_RANDOMIZATION_FACTOR;
 
+    /**
+     * 最大重试后失败
+     */
+    private boolean failAfterMaxAttempts = false;
+
+    /**
+     * 是否在在同一台机器重试, 该配置作用到负载均衡, 当前基于agent则采用拦截方式替换
+     */
+    private int retryOnSame = 0;
+
     @Override
     public boolean isInValid() {
         if (maxAttempts < 1) {
+            return true;
+        }
+        if (retryOnSame < 0) {
             return true;
         }
         if (parsedWaitDuration < 0) {
@@ -129,6 +142,14 @@ public class RetryRule extends AbstractRule {
             return true;
         }
         return super.isInValid();
+    }
+
+    public boolean isFailAfterMaxAttempts() {
+        return failAfterMaxAttempts;
+    }
+
+    public void setFailAfterMaxAttempts(boolean failAfterMaxAttempts) {
+        this.failAfterMaxAttempts = failAfterMaxAttempts;
     }
 
     public int getMaxAttempts() {
@@ -141,6 +162,14 @@ public class RetryRule extends AbstractRule {
 
     public String getWaitDuration() {
         return waitDuration;
+    }
+
+    public int getRetryOnSame() {
+        return retryOnSame;
+    }
+
+    public void setRetryOnSame(int retryOnSame) {
+        this.retryOnSame = retryOnSame;
     }
 
     /**

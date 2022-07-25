@@ -17,7 +17,8 @@
 
 package com.huawei.flowcontrol.common.init;
 
-import com.huawei.flowcontrol.common.adapte.cse.entity.CseServiceMeta;
+import com.huawei.flowcontrol.common.adapte.cse.entity.FlowControlServiceMeta;
+import com.huawei.flowcontrol.common.adapte.cse.match.MatchManager;
 import com.huawei.flowcontrol.common.adapte.cse.rule.RuleDynamicConfigListener;
 import com.huawei.flowcontrol.common.config.FlowControlConfig;
 import com.huawei.flowcontrol.common.factory.FlowControlThreadFactory;
@@ -54,24 +55,31 @@ public class FlowControlInitServiceImpl implements PluginService {
         executor.execute(flowControlLifeCycle);
     }
 
+    @Override
+    public void stop() {
+        MatchManager.INSTANCE.getMatchedCache().release();
+    }
+
     /**
      * 流控初始化逻辑生命周期
      *
      * @since 2022-03-22
      */
     static class FlowControlLifeCycle implements Runnable {
-        private ConfigSubscriber configSubscriber;
 
         @Override
         public void run() {
+            ConfigSubscriber configSubscriber;
             final FlowControlConfig pluginConfig = PluginConfigManager.getPluginConfig(FlowControlConfig.class);
             if (pluginConfig.isUseCseRule()) {
                 // 适配cse, 开始适配cse的专用配置监听器
-                configSubscriber = new CseGroupConfigSubscriber(CseServiceMeta.getInstance().getServiceName(),
+                configSubscriber = new CseGroupConfigSubscriber(FlowControlServiceMeta.getInstance().getServiceName(),
                     new RuleDynamicConfigListener(), getDynamicConfigService(), "FlowControl");
             } else {
-                configSubscriber = new DefaultGroupConfigSubscriber(CseServiceMeta.getInstance().getServiceName(),
-                    new RuleDynamicConfigListener(), getDynamicConfigService(), "FlowControl");
+                configSubscriber = new DefaultGroupConfigSubscriber(
+                        FlowControlServiceMeta.getInstance().getServiceName(),
+                    new RuleDynamicConfigListener(), getDynamicConfigService(),
+                        "FlowControl");
             }
             configSubscriber.subscribe();
         }

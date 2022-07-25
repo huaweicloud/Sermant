@@ -19,6 +19,7 @@ package com.huawei.fowcontrol.res4j.util;
 
 import com.huawei.flowcontrol.common.entity.FlowControlResult;
 import com.huawei.flowcontrol.common.enums.FlowControlEnum;
+import com.huawei.fowcontrol.res4j.exceptions.InstanceIsolationException;
 
 import io.github.resilience4j.bulkhead.BulkheadFullException;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -39,7 +40,8 @@ public class Rest4jExceptionUtils {
      * 需释放资源的异常类型
      */
     private static final Set<Class<?>> RELEASE_FLOW_CONTROL_EXCEPTIONS =
-        new HashSet<>(Arrays.asList(RequestNotPermitted.class, CallNotPermittedException.class));
+            new HashSet<>(Arrays.asList(RequestNotPermitted.class, CallNotPermittedException.class,
+                    InstanceIsolationException.class));
 
     private Rest4jExceptionUtils() {
     }
@@ -48,7 +50,7 @@ public class Rest4jExceptionUtils {
      * 处理流控异常
      *
      * @param throwable 异常信息
-     * @param result    前置返回结果
+     * @param result 前置返回结果
      */
     public static void handleException(Throwable throwable, FlowControlResult result) {
         if (throwable instanceof RequestNotPermitted) {
@@ -57,6 +59,8 @@ public class Rest4jExceptionUtils {
             result.setResult(FlowControlEnum.CIRCUIT_BREAKER);
         } else if (throwable instanceof BulkheadFullException) {
             result.setResult(FlowControlEnum.BULKHEAD_FULL);
+        } else if (throwable instanceof InstanceIsolationException) {
+            result.setResult(FlowControlEnum.INSTANCE_ISOLATION);
         } else {
             return;
         }

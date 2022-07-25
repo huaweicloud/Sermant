@@ -23,6 +23,7 @@ package com.huawei.flowcontrol.common.adapte.cse.match;
 
 import com.huawei.flowcontrol.common.adapte.cse.match.operator.Operator;
 import com.huawei.flowcontrol.common.adapte.cse.match.operator.OperatorManager;
+import com.huawei.flowcontrol.common.entity.RequestEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -50,16 +51,22 @@ public class RequestMatcher implements Matcher {
     private RawOperator apiPath;
 
     /**
-     * 方法类型
-     *     GET,
-     *     POST,
-     *     PUT,
-     *     DELETE,
-     *     HEAD,
-     *     PATCH,
-     *     OPTIONS;
+     * 方法类型 GET, POST, PUT, DELETE, HEAD, PATCH, OPTIONS;
      */
     private List<String> method;
+
+    /**
+     * 匹配的目标服务名
+     */
+    private String serviceName;
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
 
     public String getName() {
         return name;
@@ -96,21 +103,33 @@ public class RequestMatcher implements Matcher {
     /**
      * 是否匹配
      *
-     * 匹配规则如下:
-     * 1.请求的方法未被包含在内，则不通过
-     * 2.请求的路劲必须匹配
-     * 3.请求头完全匹配
+     * 匹配规则如下: 1.请求的方法未被包含在内，则不通过 2.请求的路劲必须匹配 3.请求头完全匹配
      *
-     * @param url 请求地址
-     * @param requestHeaders 请求头
-     * @param requestMethod 请求方法
+     * @param requestEntity 请求体
      * @return 是否匹配
      */
     @Override
-    public boolean match(String url, Map<String, String> requestHeaders, String requestMethod) {
-        if (isApiPathNotMatch(url) || isMethodNotMatch(requestMethod)) {
+    public boolean match(RequestEntity requestEntity) {
+        if (!isMethodMatch(requestEntity.getMethod())) {
             return false;
         }
+        if (!isServiceNameMatch(requestEntity.getServiceName())) {
+            return false;
+        }
+        if (!isHeadersMatch(requestEntity.getHeaders())) {
+            return false;
+        }
+        return isApiPathMatch(requestEntity.getApiPath());
+    }
+
+    private boolean isServiceNameMatch(String targetServiceName) {
+        if (this.serviceName == null) {
+            return true;
+        }
+        return this.serviceName.equals(targetServiceName);
+    }
+
+    private boolean isHeadersMatch(Map<String, String> requestHeaders) {
         if (this.headers == null) {
             return true;
         }
@@ -128,12 +147,18 @@ public class RequestMatcher implements Matcher {
         return true;
     }
 
-    private boolean isApiPathNotMatch(String url) {
-        return this.apiPath != null && !operatorMatch(url, this.apiPath);
+    private boolean isApiPathMatch(String api) {
+        if (api == null) {
+            return true;
+        }
+        return operatorMatch(api, this.apiPath);
     }
 
-    private boolean isMethodNotMatch(String requestMethod) {
-        return this.method != null && !this.method.contains(requestMethod);
+    private boolean isMethodMatch(String requestMethod) {
+        if (requestMethod == null) {
+            return true;
+        }
+        return this.method.contains(requestMethod);
     }
 
     private boolean operatorMatch(String target, RawOperator operator) {

@@ -23,8 +23,10 @@ com.huawei.flowcontrol.config.ApacheDubboConfigDeclarer
 com.huawei.flowcontrol.config.AlibabaDubboConfigDeclarer
 com.huawei.flowcontrol.config.SpringFactoriesDeclarer
 com.huawei.flowcontrol.config.SpringBootDeclarer
-com.huawei.flowcontrol.retry.AlibabaDubboInvokerDeclarer
-com.huawei.flowcontrol.retry.ApacheDubboInvokerDeclarer
-#com.huawei.flowcontrol.retry.ExtentionLoaderDeclarer
+#com.huawei.flowcontrol.retry.AlibabaDubboInvokerDeclarer
+#com.huawei.flowcontrol.retry.ApacheDubboInvokerDeclarer
+com.huawei.flowcontrol.retry.ExtentionLoaderDeclarer
 com.huawei.flowcontrol.retry.FeignRequestDeclarer
 com.huawei.flowcontrol.retry.HttpRequestDeclarer
+com.huawei.flowcontrol.retry.SpringRibbonLbDeclarer
+com.huawei.flowcontrol.retry.SpringLbDeclarer

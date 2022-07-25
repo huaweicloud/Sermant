@@ -17,7 +17,7 @@
 package com.huawei.flowcontrol.config;
 
 import com.huawei.flowcontrol.common.adapte.cse.constants.CseConstants;
-import com.huawei.flowcontrol.common.adapte.cse.entity.CseServiceMeta;
+import com.huawei.flowcontrol.common.adapte.cse.entity.FlowControlServiceMeta;
 import com.huawei.flowcontrol.common.config.FlowControlConfig;
 
 import com.huaweicloud.sermant.core.plugin.agent.entity.ExecuteContext;
@@ -38,29 +38,29 @@ public class AlibabaDubboConfigInterceptor extends AbstractInterceptor {
     @Override
     public ExecuteContext before(ExecuteContext context) throws Exception {
         final FlowControlConfig pluginConfig = PluginConfigManager.getPluginConfig(FlowControlConfig.class);
-        CseServiceMeta.getInstance().setDubboService(true);
+        FlowControlServiceMeta.getInstance().setDubboService(true);
         if (!pluginConfig.isUseCseRule() || !pluginConfig.isBaseSdk()) {
             return context;
         }
-        CseServiceMeta.getInstance().setVersion(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
+        FlowControlServiceMeta.getInstance().setVersion(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
             CseConstants.KEY_DUBBO_VERSION,
             CseConstants.DEFAULT_DUBBO_VERSION));
-        CseServiceMeta.getInstance().setProject(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
+        FlowControlServiceMeta.getInstance().setProject(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
             CseConstants.KEY_DUBBO_KIE_PROJECT,
             CseConstants.DEFAULT_PROJECT));
-        CseServiceMeta.getInstance().setServiceName(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
+        FlowControlServiceMeta.getInstance().setServiceName(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
             CseConstants.KEY_DUBBO_SERVICE_NAME,
             CseConstants.DEFAULT_DUBBO_SERVICE_NAME));
-        CseServiceMeta.getInstance().setEnvironment(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
+        FlowControlServiceMeta.getInstance().setEnvironment(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
             CseConstants.KEY_DUBBO_ENVIRONMENT,
             CseConstants.DEFAULT_DUBBO_ENVIRONMENT));
-        CseServiceMeta.getInstance().setApp(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
+        FlowControlServiceMeta.getInstance().setApp(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
             CseConstants.KEY_DUBBO_APP_NAME,
             CseConstants.DEFAULT_DUBBO_APP_NAME));
-        CseServiceMeta.getInstance().setCustomLabel(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
+        FlowControlServiceMeta.getInstance().setCustomLabel(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
             CseConstants.KEY_DUBBO_CUSTOM_LABEL,
             CseConstants.DEFAULT_CUSTOM_LABEL));
-        CseServiceMeta.getInstance().setCustomLabelValue(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
+        FlowControlServiceMeta.getInstance().setCustomLabelValue(com.alibaba.dubbo.common.utils.ConfigUtils.getProperty(
             CseConstants.KEY_DUBBO_CUSTOM_LABEL_VALUE,
             CseConstants.DEFAULT_CUSTOM_LABEL_VALUE));
         return context;

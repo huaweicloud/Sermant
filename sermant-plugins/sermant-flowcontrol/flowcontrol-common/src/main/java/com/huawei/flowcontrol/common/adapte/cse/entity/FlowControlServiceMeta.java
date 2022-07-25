@@ -17,13 +17,13 @@
 package com.huawei.flowcontrol.common.adapte.cse.entity;
 
 /**
- * CSE服务原信息类 - 单例 如果依赖sdk的话，可考虑直接替换为MicroserviceMeta {@see org.apache.servicecomb.governance.MicroserviceMeta}
+ * 服务原信息类 - 单例 如果依赖sdk的话，可考虑直接替换为MicroserviceMeta {@see org.apache.servicecomb.governance.MicroserviceMeta}
  *
  * @author zhouss
  * @since 2021-11-16
  */
-public class CseServiceMeta {
-    private static final CseServiceMeta INSTANCE = new CseServiceMeta();
+public class FlowControlServiceMeta {
+    private static final FlowControlServiceMeta INSTANCE = new FlowControlServiceMeta();
 
     /**
      * sc app名
@@ -65,7 +65,7 @@ public class CseServiceMeta {
      */
     private boolean isDubboService;
 
-    private CseServiceMeta() {
+    private FlowControlServiceMeta() {
     }
 
     public boolean isDubboService() {
@@ -76,7 +76,7 @@ public class CseServiceMeta {
         isDubboService = dubboService;
     }
 
-    public static CseServiceMeta getInstance() {
+    public static FlowControlServiceMeta getInstance() {
         return INSTANCE;
     }
 
