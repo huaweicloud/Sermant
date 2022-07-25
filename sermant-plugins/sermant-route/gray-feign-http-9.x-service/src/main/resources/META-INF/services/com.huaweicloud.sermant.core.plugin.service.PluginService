@@ -1,9 +1,0 @@
-#
-# Copyright (C) 2021-2021 Huawei Technologies Co., Ltd. All rights reserved.
-#
-com.huawei.gray.feign.service.ConfigServiceImpl
-com.huawei.gray.feign.service.DefaultHttpClientServiceImpl
-com.huawei.gray.feign.service.LoadBalancerClientServiceImpl
-com.huawei.gray.feign.service.PathVarServiceImpl
-com.huawei.gray.feign.service.RegisterServiceImpl
-com.huawei.gray.feign.service.ServiceInstanceListSupplierServiceImpl

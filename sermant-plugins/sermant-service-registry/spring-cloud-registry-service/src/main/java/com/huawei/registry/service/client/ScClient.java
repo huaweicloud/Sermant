@@ -63,11 +63,9 @@ import org.apache.servicecomb.service.center.client.model.ServiceCenterConfigura
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarFile;
 import java.util.logging.Logger;
@@ -99,11 +97,6 @@ public class ScClient {
      * https url前缀
      */
     private static final String HTTPS_URL_PREFIX = "https://";
-
-    /**
-     * 注册版本号
-     */
-    private static final String REG_VERSION_KEY = "reg.version";
 
     private static final int FLAG = -1;
 
@@ -426,9 +419,7 @@ public class ScClient {
         final String currentTimeMillis = String.valueOf(System.currentTimeMillis());
         microserviceInstance.setTimestamp(currentTimeMillis);
         microserviceInstance.setModTimestamp(currentTimeMillis);
-        Map<String, String> meta = new HashMap<>(RegisterContext.INSTANCE.getClientInfo().getMeta());
-        meta.put(REG_VERSION_KEY, registerConfig.getVersion());
-        microserviceInstance.setProperties(meta);
+        microserviceInstance.setProperties(RegisterContext.INSTANCE.getClientInfo().getMeta());
         if (registerConfig.isEnableZoneAware()) {
             // 设置数据中心信息
             fillDataCenterInfo();
@@ -472,6 +463,7 @@ public class ScClient {
         microservice.setVersion(registerConfig.getVersion());
         microservice.setServiceName(RegisterContext.INSTANCE.getClientInfo().getServiceId());
         microservice.setStatus(MicroserviceStatus.UP);
+        microservice.setProperties(registerConfig.getParameterMap());
         return microservice;
     }
 

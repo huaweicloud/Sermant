@@ -114,7 +114,7 @@ public class RegistryServiceImpl implements RegistryService {
     private static final String SERVICE_NAME_KEY = "service.name";
     private static final String INTERFACE_KEY = "interface";
     private static final List<String> IGNORE_REGISTRY_KEYS = Arrays.asList(GROUP_KEY, VERSION_KEY, SERVICE_NAME_KEY);
-    private static final List<String> DEFAULT_INTERFACE_KEYS = Arrays.asList("dubbo.tag", "gray.version");
+    private static final List<String> DEFAULT_INTERFACE_KEYS = Arrays.asList("dubbo.tag", "tag.version");
     private final List<Object> registryUrls = new ArrayList<>();
     private List<String> ignoreKeys;
     private ServiceCenterClient client;

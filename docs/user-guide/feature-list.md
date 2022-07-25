@@ -9,6 +9,6 @@
 |[影子库压测](online-stresstest/document.md)||实验|||
 |[服务注册](registry/document.md)|服务注册|实验|注册中心支持：ServiceComb<br>框架支持：SpringBoot 1.5.x - 2.6.2 & SpringCloud Edgware.x - 2021.0.0或Dubbo 2.6.x-2.7.x|N/A|
 |[服务双注册迁移](registry/spring-cloud-registry-migiration.md)|服务双注册迁移|实验|目标注册中心支持：ServiceComb<br>框架支持：SpringBoot 1.5.x - 2.6.2 & SpringCloud Edgware.x - 2021.0.0或Dubbo 2.6.x-2.7.x<br>SpringCloud原注册中心支持：Eureka、Nacos、Zookeeper、Consul<br>Dubbo原注册中心支持：Nacos、Zookeeper|N/A|
-|[灰度发布](route/document.md)|-|实验|Dubbo 2.6.x-2.7.x|Kie|
+|[灰度发布](router/document.md)|-|实验|Dubbo 2.6.x-2.7.x|Kie|
 |[服务监控](server-monitor/document.md)|数据库连接池监控|实验|AlibabaDruid 1.0.x, 1.1.x, 1.2.0 - 1.2.8|-|
 |[线程变量插件](threadlocal/document.md)||实验|||

@@ -1,7 +1,7 @@
 # 默认编译场景使用，不含示例工程
 plugins:
   - flowcontrol
-  - route-server
+  - service-router
   - server-monitor
   - threadlocal
   - service-registry

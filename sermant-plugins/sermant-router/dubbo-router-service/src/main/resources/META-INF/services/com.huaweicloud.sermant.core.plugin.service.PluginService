@@ -1,0 +1,8 @@
+#
+# Copyright (C) 2021-2022 Huawei Technologies Co., Ltd. All rights reserved.
+#
+
+com.huaweicloud.sermant.router.dubbo.service.AbstractDirectoryServiceImpl
+com.huaweicloud.sermant.router.dubbo.service.ApplicationConfigServiceImpl
+com.huaweicloud.sermant.router.dubbo.service.ClusterServiceImpl
+com.huaweicloud.sermant.router.dubbo.service.RegistrationServiceImpl

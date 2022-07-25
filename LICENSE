@@ -260,24 +260,6 @@ com/huawei/flowcontrol/DubboDefinition.java in this product is copied from org/a
 
 com/huawei/sermant/sample/servermonitor/provider/OpenJvmMetricProvider.java in this product is copied from org/apache/skywalking/apm/agent/core/jvm/JVMService.java of Apache SkyWalking project.
 
-com/huawei/gray/feign/service/PathVarServiceImpl.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/PathVarInterceptor.java of Apache SkyWalking project.
-
-com/huawei/gray/feign/service/DefaultHttpClientServiceImpl.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/DefaultHttpClientInterceptor.java of Apache SkyWalking project.
-
-com/huawei/gray/feign/context/FeignResolvedURL.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/FeignResolvedURL.java of Apache SkyWalking project.
-
-com/huawei/gray/feign/service/PathVarService.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/PathVarInterceptor.java of Apache SkyWalking project.
-
-com/huawei/gray/feign/service/DefaultHttpClientService.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/DefaultHttpClientInterceptor.java of Apache SkyWalking project.
-
-com/huawei/gray/feign/interceptor/PathVarInterceptor.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/PathVarInterceptor.java of Apache SkyWalking project.
-
-com/huawei/gray/feign/interceptor/DefaultHttpClientInterceptor.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/DefaultHttpClientInterceptor.java of Apache SkyWalking project.
-
-com/huawei/gray/feign/definition/PathVarDefinition.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/define/PathVarInstrumentation.java of Apache SkyWalking project.
-
-com/huawei/gray/feign/definition/DefaultHttpClientDefinition.java in this product is copied from org/apache/skywalking/apm/plugin/feign/http/v9/define/DefaultHttpClientInstrumentation.java of Apache SkyWalking project.
-
 com/huawei/flowrecord/plugins/dubbo/DubboInterceptor.java in this product is copied from org/apache/skywalking/apm/plugin/asf/dubbo/DubboInterceptor.java of Apache SkyWalking project.
 
 com/huawei/flowrecord/plugins/dubbo/DubboInstrumentation.java in this product is copied from org/apache/skywalking/apm/plugin/asf/dubbo/DubboInstrumentation.java of Apache SkyWalking project.

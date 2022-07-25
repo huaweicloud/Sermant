@@ -1,8 +1,0 @@
-#
-# Copyright (C) 2021-2022 Huawei Technologies Co., Ltd. All rights reserved.
-#
-
-com.huawei.gray.dubbo.declarer.AbstractDirectoryDeclarer
-com.huawei.gray.dubbo.declarer.ApplicationConfigDeclarer
-com.huawei.gray.dubbo.declarer.ClusterDefinition
-com.huawei.gray.dubbo.declarer.RegistrationDeclarer

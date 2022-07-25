@@ -2,7 +2,7 @@
 plugins:
   - example
   - flowcontrol
-  - route-server
+  - service-router
   - server-monitor
   - threadlocal
   - service-registry

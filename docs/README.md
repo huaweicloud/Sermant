@@ -83,7 +83,7 @@ mvn clean package -Dmaven.test.skip
 |[全链路压测功能介绍](user-guide/hercules/document.md)|使用手册|
 |[影子库压测功能介绍](user-guide/online-stresstest/document.md)|使用手册|
 |[服务注册功能介绍](user-guide/registry/document.md)|使用手册|
-|[灰度发布功能介绍](user-guide/route/document.md)|使用手册|
+|[灰度发布功能介绍](user-guide/router/document.md)|使用手册|
 |[服务监控功能介绍](user-guide/server-monitor/document.md)|使用手册|
 |[线程变量插件功能介绍](user-guide/threadlocal/document.md)|使用手册|
 |[当前插件功能汇总列表](user-guide/feature-list.md)|使用手册|

@@ -19,6 +19,8 @@ package com.huaweicloud.sermant.core.plugin.config;
 import com.huaweicloud.sermant.core.config.common.BaseConfig;
 import com.huaweicloud.sermant.core.config.common.ConfigTypeKey;
 
+import java.util.Map;
+
 /**
  * 配置当前服务信息
  *
@@ -56,6 +58,8 @@ public class ServiceMeta implements BaseConfig {
      * 自定义标签值
      */
     private String customLabelValue = "default";
+
+    private Map<String, String> parameter;
 
     public String getCustomLabel() {
         return customLabel;
@@ -103,5 +107,13 @@ public class ServiceMeta implements BaseConfig {
 
     public void setEnvironment(String environment) {
         this.environment = environment;
+    }
+
+    public Map<String, String> getParameter() {
+        return parameter;
+    }
+
+    public void setParameter(Map<String, String> parameter) {
+        this.parameter = parameter;
     }
 }
