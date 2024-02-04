@@ -31,12 +31,7 @@ import com.huaweicloud.sermant.core.exception.DupServiceException;
 import com.huaweicloud.sermant.core.utils.KeyGenerateUtils;
 import com.huaweicloud.sermant.core.utils.SpiLoadUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.ServiceLoader;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -77,6 +72,12 @@ public class ServiceManager {
      */
     public static final String TRACING_SERVICE_IMPL =
             "com.huaweicloud.sermant.implement.service.tracing.TracingServiceImpl";
+
+    /**
+     * HttpServer服务类名
+     */
+    public static final String HTTP_SERVER_SERVICE_IMPL =
+            "com.huaweicloud.sermant.implement.service.httpserver.HttpServerServiceImpl";
 
     /**
      * 日志
