@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2023 Huawei Technologies Co., Ltd. All rights reserved.
+ * Copyright (C) 2024-2024 Huawei Technologies Co., Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9,10 +9,11 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR C¬ONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.huaweicloud.sermant.implement.service.httpserver.common;
 
 import com.huaweicloud.sermant.core.service.httpserver.annotation.HttpRouteMapping;
@@ -24,14 +25,19 @@ import com.huaweicloud.sermant.implement.service.httpserver.exception.HttpMethod
 import java.util.regex.Pattern;
 
 /**
+ * HTTP 路由
+ *
  * @author zwmagic
  * @since 2024-02-03
  */
 public class HttpRouter {
+
     private final Pattern pattern;
 
     private final String path;
+
     private final HttpMethod method;
+
     private final HttpRouteHandler handler;
 
     public HttpRouter(String pluginName, HttpRouteHandler handler) {
@@ -43,11 +49,11 @@ public class HttpRouter {
     }
 
     private String buildPath(String pluginName, String path) {
-        StringBuilder builder = new StringBuilder("/").append(pluginName);
-        if (path.startsWith("/")) {
+        StringBuilder builder = new StringBuilder(Constants.HTTP_PATH_DIVIDER).append(pluginName);
+        if (path.startsWith(Constants.HTTP_PATH_DIVIDER)) {
             builder.append(path);
         } else {
-            builder.append("/").append(path);
+            builder.append(Constants.HTTP_PATH_DIVIDER).append(path);
         }
         return builder.toString();
     }
@@ -80,26 +86,26 @@ public class HttpRouter {
     }
 
     private static String exprCompile(String expr) {
-        //替换特殊符号
-        String p = expr;
-        p = p.replace(".", "\\.");
-        p = p.replace("$", "\\$");
-        //替换中间的**值
-        p = p.replace("**", ".[]");
-        //替换*值
-        p = p.replace("*", "[^/]*");
-        //替换{x}值
-        if (p.contains("{")) {
-            if (p.indexOf("_}") > 0) {
-                p = p.replaceAll("\\{[^\\}]+?\\_\\}", "(.+?)");
+        // 替换特殊符号
+        String expression = expr;
+        expression = expression.replace(".", "\\.");
+        expression = expression.replace("$", "\\$");
+        // 替换中间的**值
+        expression = expression.replace("**", ".[]");
+        // 替换*值
+        expression = expression.replace("*", "[^/]*");
+        // 替换{x}值
+        if (expression.contains("{")) {
+            if (expression.indexOf("_}") > 0) {
+                expression = expression.replaceAll("\\{[^\\}]+?\\_\\}", "(.+?)");
             }
-            p = p.replaceAll("\\{[^\\}]+?\\}", "([^/]+?)");//不采用group name,可解决_的问题
+            expression = expression.replaceAll("\\{[^\\}]+?\\}", "([^/]+?)");//不采用group name,可解决_的问题
         }
-        if (!p.startsWith("/")) {
-            p = "/" + p;
+        if (!expression.startsWith("/")) {
+            expression = "/" + expression;
         }
-        p = p.replace(".[]", ".*");
-        return "^" + p + "$";
+        expression = expression.replace(".[]", ".*");
+        return "^" + expression + "$";
     }
 
 }

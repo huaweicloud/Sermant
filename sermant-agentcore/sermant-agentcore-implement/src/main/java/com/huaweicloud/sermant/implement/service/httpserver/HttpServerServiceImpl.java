@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2023 Huawei Technologies Co., Ltd. All rights reserved.
+ * Copyright (C) 2024-2024 Huawei Technologies Co., Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9,10 +9,11 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR C¬ONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.huaweicloud.sermant.implement.service.httpserver;
 
 import com.huaweicloud.sermant.core.common.LoggerFactory;
@@ -22,6 +23,7 @@ import com.huaweicloud.sermant.core.service.httpserver.HttpServerService;
 import com.huaweicloud.sermant.core.service.httpserver.config.HttpServerConfig;
 import com.huaweicloud.sermant.core.utils.SpiLoadUtils;
 import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
+
 import org.kohsuke.MetaInfServices;
 
 import java.util.Map;
@@ -29,19 +31,19 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
+ * httpserver服务实现
+ *
  * @author zwmagic
  * @since 2024-02-02
  */
 @MetaInfServices(BaseService.class)
 public class HttpServerServiceImpl implements HttpServerService {
-
     private static final Logger LOGGER = LoggerFactory.getLogger();
 
     private HttpServerProvider httpServerProvider;
 
     @Override
     public void start() {
-
         Map<String, HttpServerProvider> providerMap = SpiLoadUtils.loadAll(HttpServerProvider.class,
                         this.getClass().getClassLoader()).stream()
                 .collect(Collectors.toMap(HttpServerProvider::getType, provider -> provider));
@@ -70,5 +72,4 @@ public class HttpServerServiceImpl implements HttpServerService {
         }
         LOGGER.info("HttpServerService stopped.");
     }
-
 }

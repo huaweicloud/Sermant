@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2023 Huawei Technologies Co., Ltd. All rights reserved.
+ * Copyright (C) 2024-2024 Huawei Technologies Co., Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9,31 +9,34 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR C¬ONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.huaweicloud.sermant.implement.service.httpserver.simple;
 
-import com.alibaba.fastjson.JSON;
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpResponse;
+import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
+
+import com.alibaba.fastjson.JSON;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
+ * 简单http响应
+ *
  * @author zwmagic
  * @since 2024-02-02
  */
 public class SimpleHttpResponse implements HttpResponse {
-
     private final HttpExchange exchange;
-    private int status = 200;
+
+    private int status = Constants.SUCCESS_STATUS;
 
     public SimpleHttpResponse(HttpExchange exchange) {
         this.exchange = exchange;
@@ -91,27 +94,25 @@ public class SimpleHttpResponse implements HttpResponse {
         if (str == null) {
             str = "";
         }
-        byte[] bytes = str.getBytes();
+        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
         contentLength(bytes.length);
         writeBody(bytes);
-    }
-
-    @Override
-    public void writeBody(Throwable ex) {
-        StringWriter writer = new StringWriter();
-        ex.printStackTrace(new PrintWriter(writer, true));
-        this.writeBody(writer.getBuffer().toString());
-    }
-
-    @Override
-    public void writeBodyAsJson(Object obj) {
-        writeBodyAsJson(JSON.toJSONString(obj));
     }
 
     @Override
     public void writeBodyAsJson(String json) {
         contentType("application/json;charset=utf-8");
         writeBody(json);
+    }
+
+    @Override
+    public void writeBody(Throwable ex) {
+        this.writeBody(ex.getMessage());
+    }
+
+    @Override
+    public void writeBodyAsJson(Object obj) {
+        writeBodyAsJson(JSON.toJSONString(obj));
     }
 
     @Override
@@ -122,7 +123,7 @@ public class SimpleHttpResponse implements HttpResponse {
             out = exchange.getResponseBody();
             out.write(bytes);
             exchange.close();
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         } finally {
             if (out != null) {
@@ -134,5 +135,4 @@ public class SimpleHttpResponse implements HttpResponse {
             }
         }
     }
-
 }

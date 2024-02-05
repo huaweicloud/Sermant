@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2023 Huawei Technologies Co., Ltd. All rights reserved.
+ * Copyright (C) 2024-2024 Huawei Technologies Co., Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -9,20 +9,27 @@
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR C¬ONDITIONS OF ANY KIND, either express or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.huaweicloud.sermant.implement.service.httpserver.simple;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpRequest;
 import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
 import com.huaweicloud.sermant.core.utils.StringUtils;
+import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.sun.net.httpserver.HttpExchange;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -34,10 +41,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * 简单http请求实现
+ *
  * @author zwmagic
  * @since 2024-02-02
  */
 public class SimpleHttpRequest implements HttpRequest {
+    private static final int BODY_BYTE_SIZE = 512;
 
     private final HttpExchange exchange;
 
@@ -61,9 +71,9 @@ public class SimpleHttpRequest implements HttpRequest {
         if (path != null) {
             return path;
         }
-        String[] array = originalPath().split("/");
+        String[] array = originalPath().split(Constants.HTTP_PATH_DIVIDER);
         List<String> phases = Stream.of(array).filter(s -> !s.isEmpty()).collect(Collectors.toList());
-        path = "/" + String.join("/", phases);
+        path = Constants.HTTP_PATH_DIVIDER + String.join(Constants.HTTP_PATH_DIVIDER, phases);
         return path;
     }
 
@@ -135,9 +145,10 @@ public class SimpleHttpRequest implements HttpRequest {
             for (String pair : pairs) {
                 String[] keyVal = pair.split("=");
                 if (keyVal.length > 1) {
-                    params.put(URLDecoder.decode(keyVal[0], "UTF-8"), URLDecoder.decode(keyVal[1], "UTF-8"));
+                    params.put(URLDecoder.decode(keyVal[0], Constants.DEFAULT_ENCODE),
+                            URLDecoder.decode(keyVal[1], Constants.DEFAULT_ENCODE));
                 } else {
-                    params.put(URLDecoder.decode(keyVal[0], "UTF-8"), "");
+                    params.put(URLDecoder.decode(keyVal[0], Constants.DEFAULT_ENCODE), "");
                 }
             }
         } catch (UnsupportedEncodingException e) {
@@ -165,7 +176,7 @@ public class SimpleHttpRequest implements HttpRequest {
             }
             reader.close();
         } catch (Exception e) {
-            throw new HttpServerException(500, e);
+            throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
         }
         return body.toString();
     }
@@ -190,13 +201,13 @@ public class SimpleHttpRequest implements HttpRequest {
             }
             ByteArrayOutputStream outs = new ByteArrayOutputStream();
             int len;
-            byte[] buf = new byte[512];
+            byte[] buf = new byte[BODY_BYTE_SIZE];
             while ((len = ins.read(buf)) != -1) {
                 outs.write(buf, 0, len);
             }
             return outs.toByteArray();
         } catch (Exception e) {
-            throw new HttpServerException(500, e);
+            throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
         }
     }
 
@@ -204,5 +215,4 @@ public class SimpleHttpRequest implements HttpRequest {
     public InputStream bodyAsStream() {
         return exchange.getRequestBody();
     }
-
 }

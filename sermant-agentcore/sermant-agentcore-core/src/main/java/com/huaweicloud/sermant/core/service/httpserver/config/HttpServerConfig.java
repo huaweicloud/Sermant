@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2022 Huawei Technologies Co., Ltd. All rights reserved.
+ * Copyright (C) 2024-2024 Huawei Technologies Co., Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ public class HttpServerConfig implements BaseConfig {
      * 默认端口号
      */
     private int port = 47128;
+
     /**
      * 允许远程访问开关
      */
@@ -51,7 +52,6 @@ public class HttpServerConfig implements BaseConfig {
      * HTTP Server 最大线程池
      */
     private Integer serverMaxPoolSize;
-
 
     public String getType() {
         return type;
