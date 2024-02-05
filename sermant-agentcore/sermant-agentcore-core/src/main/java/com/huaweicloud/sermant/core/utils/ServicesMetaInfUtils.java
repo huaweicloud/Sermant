@@ -44,8 +44,7 @@ import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
 /**
- * 添加@HttpRouteMapping注解的类，
- * 在编译时自动生成com.huaweicloud.sermant.core.service.httpserver.api.HttpRouteHandler的SPI
+ * 添加@HttpRouteMapping注解的类，在编译时自动生成com.huaweicloud.sermant.core.service.httpserver.api.HttpRouteHandler的SPI
  *
  * @author zwmagic
  * @since 2024-02-03
@@ -53,9 +52,9 @@ import javax.tools.StandardLocation;
 @SupportedSourceVersion(value = SourceVersion.RELEASE_8)
 @MetaInfServices(Processor.class)
 public class ServicesMetaInfUtils extends AbstractProcessor {
-
     private static final String ANNOTATION =
             "com.huaweicloud.sermant.core.service.httpserver.annotation.HttpRouteMapping";
+
     private static final String INTERFACE = "com.huaweicloud.sermant.core.service.httpserver.api.HttpRouteHandler";
 
     private Messager messager;
@@ -136,5 +135,4 @@ public class ServicesMetaInfUtils extends AbstractProcessor {
     private String getResourceFileName(String contact) {
         return "META-INF/services/" + contact;
     }
-
 }
