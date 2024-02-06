@@ -18,6 +18,7 @@ package com.huaweicloud.sermant.implement.service.httpserver.simple;
 
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpRequest;
 import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
+import com.huaweicloud.sermant.core.utils.CollectionUtils;
 import com.huaweicloud.sermant.core.utils.StringUtils;
 import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
 
@@ -27,6 +28,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -77,7 +79,7 @@ public class SimpleHttpRequest implements HttpRequest {
             return path;
         }
         String[] array = originalPath().split(Constants.HTTP_PATH_DIVIDER);
-        List<String> phases = Stream.of(array).filter(s -> !s.isEmpty()).collect(Collectors.toList());
+        List<String> phases = Stream.of(array).filter(phase -> !phase.isEmpty()).collect(Collectors.toList());
         path = Constants.HTTP_PATH_DIVIDER + String.join(Constants.HTTP_PATH_DIVIDER, phases);
         return path;
     }
@@ -113,8 +115,8 @@ public class SimpleHttpRequest implements HttpRequest {
 
     @Override
     public String getFirstHeader(String name) {
-        List<String> value = exchange.getRequestHeaders().get(name);
-        return value == null || value.isEmpty() ? null : value.get(0);
+        List<String> headers = exchange.getRequestHeaders().get(name);
+        return CollectionUtils.isEmpty(headers) ? null : headers.get(0);
     }
 
     @Override
@@ -173,15 +175,23 @@ public class SimpleHttpRequest implements HttpRequest {
     @Override
     public String body(Charset charset) throws HttpServerException {
         StringBuilder body = new StringBuilder();
+        BufferedReader reader = null;
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(bodyAsStream(), charset));
+            reader = new BufferedReader(new InputStreamReader(bodyAsStream(), charset));
             String line;
             while ((line = reader.readLine()) != null) {
                 body.append(line);
             }
-            reader.close();
         } catch (Exception e) {
             throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
+                }
+            }
         }
         return body.toString();
     }

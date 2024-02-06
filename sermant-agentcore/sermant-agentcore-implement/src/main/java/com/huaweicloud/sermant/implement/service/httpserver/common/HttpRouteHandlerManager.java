@@ -22,6 +22,7 @@ import com.huaweicloud.sermant.core.plugin.PluginManager;
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpRequest;
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpRouteHandler;
 import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
+import com.huaweicloud.sermant.core.utils.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +69,7 @@ public class HttpRouteHandlerManager {
     private Optional<HttpRouteHandler> getHandler0(HttpRequest request) {
         String pluginName = getPluginName(request);
         List<HttpRouter> routers = getRouteHandlers(pluginName);
-        if (routers == null || routers.isEmpty()) {
+        if (CollectionUtils.isEmpty(routers)) {
             return Optional.empty();
         }
         for (HttpRouter router : routers) {
@@ -85,6 +86,9 @@ public class HttpRouteHandlerManager {
             return routers;
         }
         synchronized (routersMapping) {
+            if (routers != null) {
+                return routers;
+            }
             ClassLoader classLoader;
             if (SERMANT_PLUGIN_NAME.equals(pluginName)) {
                 classLoader = ClassLoaderManager.getFrameworkClassLoader();
@@ -93,8 +97,8 @@ public class HttpRouteHandlerManager {
                 if (plugin == null) {
                     return Collections.emptyList();
                 }
-                classLoader = plugin.getServiceClassLoader() != null
-                        ? plugin.getServiceClassLoader() : plugin.getPluginClassLoader();
+                classLoader = plugin.getServiceClassLoader() != null ? plugin.getServiceClassLoader()
+                        : plugin.getPluginClassLoader();
             }
             addRouteHandlers(pluginName, classLoader);
             routers = routersMapping.get(pluginName);
@@ -105,7 +109,7 @@ public class HttpRouteHandlerManager {
 
     private void addRouteHandlers(String pluginName, ClassLoader classLoader) {
         for (HttpRouteHandler handler : ServiceLoader.load(HttpRouteHandler.class, classLoader)) {
-            List<HttpRouter> routers = routersMapping.computeIfAbsent(pluginName, k -> new ArrayList<>());
+            List<HttpRouter> routers = routersMapping.computeIfAbsent(pluginName, list -> new ArrayList<>());
             routers.add(new HttpRouter(pluginName, handler));
         }
     }
