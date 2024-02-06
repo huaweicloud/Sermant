@@ -57,6 +57,11 @@ public class SimpleHttpRequest implements HttpRequest {
 
     private final Map<String, String> params = new HashMap<>();
 
+    /**
+     * 构造函数，用于创建一个SimpleHttpRequest对象。
+     *
+     * @param exchange HttpExchange对象，用于与服务器进行通信
+     */
     public SimpleHttpRequest(HttpExchange exchange) {
         this.exchange = exchange;
     }
@@ -197,7 +202,7 @@ public class SimpleHttpRequest implements HttpRequest {
     public byte[] bodyAsBytes() throws HttpServerException {
         try (InputStream ins = bodyAsStream()) {
             if (ins == null) {
-                return null;
+                return new byte[0];
             }
             ByteArrayOutputStream outs = new ByteArrayOutputStream();
             int len;

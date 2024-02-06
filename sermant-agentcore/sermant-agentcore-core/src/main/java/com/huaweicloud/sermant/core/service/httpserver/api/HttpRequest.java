@@ -31,7 +31,6 @@ import java.util.Map;
  * @since 2024-02-02
  */
 public interface HttpRequest {
-
     /**
      * 获取URI。
      *
@@ -41,50 +40,50 @@ public interface HttpRequest {
 
     /**
      * 经过解析后的请求path
-     * <pre>
-     * eg：http://127.0.0.1:8080/api/v1/test， path为/api/v1/test
-     * eg：http://127.0.0.1:8080//api//v1////test， path为/api/v1/test
-     * </pre>
+     *
      * @return 请求的path
      */
     String path();
 
     /**
      * 原始的请求path
-     * <pre>
-     * eg：http://127.0.0.1:8080/api/v1/test， path为/api/v1/test
-     * eg：http://127.0.0.1:8080/api/v1/test?k1=v1&k2=v2， path为/api/v1/test
-     * eg：http://127.0.0.1:8080//api//v1////test， path为//api//v1////test
-     * </pre>
+     *
      * @return 请求的path
      */
     String originalPath();
 
     /**
+     * HTTP 方法
      *
      * @return HttpMethod，如 GET POST等
      */
     String method();
 
     /**
-     * 从header中获取Content-Type
-     * @return
+     * 获取内容类型。
+     *
+     * @return 内容类型
      */
     String contentType();
 
     /**
-     * 客户端请求的IP
-     * @return
+     * 获取IP地址。
+     *
+     * @return IP地址
      */
     String getIp();
 
     /**
+     * 获取指定名称的header的第一个值。
+     *
      * @param name header的key
      * @return 返回指定name的header的第一个值
      */
     String getFirstHeader(String name);
 
     /**
+     * 获取指定名称的header的第一个值。
+     *
      * @param name header的key
      * @param defaultValue 当值是null时，返回默认值
      * @return 返回指定name的header的第一个值
@@ -92,7 +91,9 @@ public interface HttpRequest {
     String getFirstHeader(String name, String defaultValue);
 
     /**
-     * @return http请求的所有header信息
+     * 获取所有的header。
+     *
+     * @return 返回一个包含所有header的Map，其中key为header的名称，value为该header的值列表
      */
     Map<String, List<String>> getHeaders();
 
@@ -101,6 +102,7 @@ public interface HttpRequest {
      * <pre>
      *     eg: http://127.0.0.1:8080/api/v1/test?k1=v1&k2=v2， params为k1=v1&k2=v2
      * </pre>
+     *
      * @param name 参数名
      * @return 返回指定name的参数
      */
@@ -111,6 +113,7 @@ public interface HttpRequest {
      * <pre>
      *     eg: http://127.0.0.1:8080/api/v1/test?k1=v1&k2=v2， params为k1=v1&k2=v2
      * </pre>
+     *
      * @param name 参数名
      * @param defaultValue 当值是null时，返回默认值
      * @return 返回指定name的参数
@@ -122,6 +125,7 @@ public interface HttpRequest {
      * <pre>
      *     eg: http://127.0.0.1:8080/api/v1/test?k1=v1&k2=v2， params为k1=v1&k2=v2
      * </pre>
+     *
      * @return 返回指定name的参数
      */
     Map<String, String> params();
@@ -133,6 +137,16 @@ public interface HttpRequest {
      * @throws HttpServerException 如果发生HTTP服务异常
      */
     String body() throws HttpServerException;
+
+    /**
+     * 从请求体中解析出指定类型的对象。
+     *
+     * @param <T> 泛型类型
+     * @param clazz 要解析的类
+     * @return 解析出的对象
+     * @throws HttpServerException 如果发生HTTP服务异常
+     */
+    <T> T body(Class<T> clazz) throws HttpServerException;
 
     /**
      * 获取请求的主体内容。
@@ -152,17 +166,9 @@ public interface HttpRequest {
     byte[] bodyAsBytes() throws HttpServerException;
 
     /**
-     * 从请求体中解析出指定类型的对象。
-     *
-     * @param clazz 要解析的类
-     * @return 解析出的对象
-     * @throws HttpServerException 如果发生HTTP服务异常
-     */
-    <T> T body(Class<T> clazz) throws HttpServerException;
-
-    /**
      * 从请求体中解析出指定类型的对象列表。
      *
+     * @param <T> 泛型类型
      * @param clazz 要解析的类
      * @return 解析出的对象列表
      * @throws HttpServerException 如果发生HTTP服务异常
@@ -175,5 +181,4 @@ public interface HttpRequest {
      * @return 请求体的输入流
      */
     InputStream bodyAsStream();
-
 }

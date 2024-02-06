@@ -17,6 +17,7 @@
 package com.huaweicloud.sermant.implement.service.httpserver.simple;
 
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpResponse;
+import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
 import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
 
 import com.alibaba.fastjson.JSON;
@@ -38,6 +39,11 @@ public class SimpleHttpResponse implements HttpResponse {
 
     private int status = Constants.SUCCESS_STATUS;
 
+    /**
+     * 构造函数，用于创建一个SimpleHttpResponse对象。
+     *
+     * @param exchange HttpExchange对象，用于与服务器进行通信
+     */
     public SimpleHttpResponse(HttpExchange exchange) {
         this.exchange = exchange;
     }
@@ -48,8 +54,8 @@ public class SimpleHttpResponse implements HttpResponse {
     }
 
     @Override
-    public HttpResponse status(int status) {
-        this.status = status;
+    public HttpResponse status(int code) {
+        this.status = code;
         return this;
     }
 
@@ -90,11 +96,34 @@ public class SimpleHttpResponse implements HttpResponse {
     }
 
     @Override
-    public void writeBody(String str) {
-        if (str == null) {
-            str = "";
+    public void writeBody(Throwable ex) {
+        this.writeBody(ex.getMessage());
+    }
+
+    @Override
+    public void writeBody(byte[] bytes) {
+        OutputStream out = null;
+        try {
+            exchange.sendResponseHeaders(status, bytes.length);
+            out = exchange.getResponseBody();
+            out.write(bytes);
+            exchange.close();
+        } catch (IOException ex) {
+            throw new HttpServerException(Constants.SERVER_ERROR_STATUS, ex);
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
+                }
+            }
         }
-        byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public void writeBody(String str) {
+        byte[] bytes = str == null ? new byte[0] : str.getBytes(StandardCharsets.UTF_8);
         contentLength(bytes.length);
         writeBody(bytes);
     }
@@ -106,33 +135,7 @@ public class SimpleHttpResponse implements HttpResponse {
     }
 
     @Override
-    public void writeBody(Throwable ex) {
-        this.writeBody(ex.getMessage());
-    }
-
-    @Override
     public void writeBodyAsJson(Object obj) {
         writeBodyAsJson(JSON.toJSONString(obj));
-    }
-
-    @Override
-    public void writeBody(byte[] bytes) {
-        OutputStream out = null;
-        try {
-            exchange.sendResponseHeaders(status, bytes.length);
-            out = exchange.getResponseBody();
-            out.write(bytes);
-            exchange.close();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
     }
 }

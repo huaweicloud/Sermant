@@ -23,15 +23,13 @@ package com.huaweicloud.sermant.core.service.httpserver.api;
  * @since 2024-02-02
  */
 public interface HttpRouteHandler {
-
     /**
      * 处理HTTP请求
      *
-     * @param request  HTTP请求对象
+     * @param request HTTP请求对象
      * @param response HTTP响应对象
      * @throws Exception 如果处理过程中发生异常
      */
     void handle(HttpRequest request, HttpResponse response) throws Exception;
-
 }
 

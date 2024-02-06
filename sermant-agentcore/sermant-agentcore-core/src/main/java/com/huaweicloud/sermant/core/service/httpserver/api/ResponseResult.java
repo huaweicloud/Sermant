@@ -24,35 +24,74 @@ package com.huaweicloud.sermant.core.service.httpserver.api;
  * @since 2024-02-03
  */
 public class ResponseResult<T> {
-
     private boolean success;
 
     private String message;
 
     private T data;
 
+    /**
+     * 构造函数，用于创建一个ResponseResult对象。
+     *
+     * @param success 表示操作是否成功
+     * @param message 操作成功或失败时的提示信息
+     * @param data 操作成功时返回的数据
+     */
     public ResponseResult(boolean success, String message, T data) {
         this.success = success;
         this.message = message;
         this.data = data;
     }
 
+    /**
+     * 创建一个成功的ResponseResult对象。
+     *
+     * @param <T> 泛型类型
+     * @return ResponseResult对象
+     */
     public static <T> ResponseResult<T> ofSuccess() {
         return new ResponseResult<>(true, null, null);
     }
 
+    /**
+     * 创建一个成功的ResponseResult对象，并指定数据。
+     *
+     * @param <T> 泛型类型
+     * @param data 数据
+     * @return ResponseResult对象
+     */
     public static <T> ResponseResult<T> ofSuccess(T data) {
         return new ResponseResult<>(true, null, data);
     }
 
+    /**
+     * 创建一个失败的ResponseResult对象。
+     *
+     * @param <T> 泛型类型
+     * @return ResponseResult对象
+     */
     public static <T> ResponseResult<T> ofFailure() {
         return new ResponseResult<>(false, null, null);
     }
 
+    /**
+     * 创建一个失败的ResponseResult对象，并指定数据。
+     *
+     * @param <T> 泛型类型
+     * @param data 数据
+     * @return ResponseResult对象
+     */
     public static <T> ResponseResult<T> ofFailure(T data) {
         return new ResponseResult<>(false, null, data);
     }
 
+    /**
+     * 创建一个失败的ResponseResult对象，并指定异常信息。
+     *
+     * @param <T> 泛型类型
+     * @param t 异常信息
+     * @return ResponseResult对象
+     */
     public static <T> ResponseResult<T> ofFailure(Throwable t) {
         return new ResponseResult<>(false, t.getMessage(), null);
     }

@@ -23,23 +23,49 @@ package com.huaweicloud.sermant.implement.service.httpserver.common;
  * @since 2024-02-02
  */
 public class Constants {
-
+    /**
+     * 简单HTTP服务器类型
+     */
     public static final String SIMPLE_HTTP_SERVER_TYPE = "simple";
 
+    /**
+     * 默认编码
+     */
     public static final String DEFAULT_ENCODE = "UTF-8";
 
+    /**
+     * 请求成功状态码
+     */
     public static final int SUCCESS_STATUS = 200;
 
+    /**
+     * 请求方法不允许状态码
+     */
     public static final int METHOD_NOT_ALLOWED_STATUS = 405;
 
+    /**
+     * 服务器错误状态码
+     */
     public static final int SERVER_ERROR_STATUS = 500;
 
+    /**
+     * 请求未找到状态码
+     */
     public static final int NOT_FOUND_STATUS = 405;
 
+    /**
+     * 请求错误状态码
+     */
     public static final int BAD_REQUEST_STATUS = 400;
 
+    /**
+     * HTTP路径分隔符
+     */
     public static final String HTTP_PATH_DIVIDER = "/";
 
+    /**
+     * 私有构造方法，防止外部实例化
+     */
     private Constants() {
     }
 

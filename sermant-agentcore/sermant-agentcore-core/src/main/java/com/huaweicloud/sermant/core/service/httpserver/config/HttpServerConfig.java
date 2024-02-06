@@ -28,6 +28,8 @@ import com.huaweicloud.sermant.core.config.common.ConfigTypeKey;
 @ConfigTypeKey("httpserver")
 public class HttpServerConfig implements BaseConfig {
 
+    private static final int DEFAULT_PORT = 47128;
+
     /**
      * HTTP Server 类型
      */
@@ -36,7 +38,7 @@ public class HttpServerConfig implements BaseConfig {
     /**
      * 默认端口号
      */
-    private int port = 47128;
+    private int port = DEFAULT_PORT;
 
     /**
      * 允许远程访问开关

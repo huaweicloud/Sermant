@@ -40,6 +40,12 @@ public class HttpRouter {
 
     private final HttpRouteHandler handler;
 
+    /**
+     * 构造函数，用于创建HttpRouter对象
+     *
+     * @param pluginName 插件名称
+     * @param handler HttpRouteHandler对象
+     */
     public HttpRouter(String pluginName, HttpRouteHandler handler) {
         HttpRouteMapping annotation = handler.getClass().getAnnotation(HttpRouteMapping.class);
         this.path = buildPath(pluginName, annotation.path());
@@ -48,16 +54,22 @@ public class HttpRouter {
         this.handler = handler;
     }
 
-    private String buildPath(String pluginName, String path) {
+    private String buildPath(String pluginName, String httpPath) {
         StringBuilder builder = new StringBuilder(Constants.HTTP_PATH_DIVIDER).append(pluginName);
-        if (path.startsWith(Constants.HTTP_PATH_DIVIDER)) {
-            builder.append(path);
+        if (httpPath.startsWith(Constants.HTTP_PATH_DIVIDER)) {
+            builder.append(httpPath);
         } else {
-            builder.append(Constants.HTTP_PATH_DIVIDER).append(path);
+            builder.append(Constants.HTTP_PATH_DIVIDER).append(httpPath);
         }
         return builder.toString();
     }
 
+    /**
+     * 判断请求是否匹配当前HttpRouter
+     *
+     * @param request HttpRequest对象
+     * @return 如果请求匹配则返回true，否则返回false
+     */
     public boolean match(HttpRequest request) {
         if (!matchPath(request.path())) {
             return false;
@@ -86,20 +98,16 @@ public class HttpRouter {
     }
 
     private static String exprCompile(String expr) {
-        // 替换特殊符号
         String expression = expr;
         expression = expression.replace(".", "\\.");
         expression = expression.replace("$", "\\$");
-        // 替换中间的**值
         expression = expression.replace("**", ".[]");
-        // 替换*值
         expression = expression.replace("*", "[^/]*");
-        // 替换{x}值
         if (expression.contains("{")) {
             if (expression.indexOf("_}") > 0) {
                 expression = expression.replaceAll("\\{[^\\}]+?\\_\\}", "(.+?)");
             }
-            expression = expression.replaceAll("\\{[^\\}]+?\\}", "([^/]+?)");//不采用group name,可解决_的问题
+            expression = expression.replaceAll("\\{[^\\}]+?\\}", "([^/]+?)");
         }
         if (!expression.startsWith("/")) {
             expression = "/" + expression;

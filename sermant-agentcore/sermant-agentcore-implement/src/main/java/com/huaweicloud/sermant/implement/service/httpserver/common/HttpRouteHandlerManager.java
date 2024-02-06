@@ -24,8 +24,10 @@ import com.huaweicloud.sermant.core.service.httpserver.api.HttpRouteHandler;
 import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,7 +49,13 @@ public class HttpRouteHandlerManager {
     private HttpRouteHandlerManager() {
     }
 
-    public static HttpRouteHandler getHandler(HttpRequest request) {
+    /**
+     * 获取与给定请求对应的HttpRouteHandler。
+     *
+     * @param request 请求对象
+     * @return 包含HttpRouteHandler的Optional对象，如果不存在对应的HttpRouteHandler则返回空的Optional对象
+     */
+    public static Optional<HttpRouteHandler> getHandler(HttpRequest request) {
         return INSTANCE.getHandler0(request);
     }
 
@@ -57,18 +65,18 @@ public class HttpRouteHandlerManager {
      * @param request 请求对象
      * @return HttpRouteHandler对象
      */
-    private HttpRouteHandler getHandler0(HttpRequest request) {
+    private Optional<HttpRouteHandler> getHandler0(HttpRequest request) {
         String pluginName = getPluginName(request);
         List<HttpRouter> routers = getRouteHandlers(pluginName);
         if (routers == null || routers.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
         for (HttpRouter router : routers) {
             if (router.match(request)) {
-                return router.getHandler();
+                return Optional.of(router.getHandler());
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private List<HttpRouter> getRouteHandlers(String pluginName) {
@@ -83,7 +91,7 @@ public class HttpRouteHandlerManager {
             } else {
                 Plugin plugin = PluginManager.getPluginMap().get(pluginName);
                 if (plugin == null) {
-                    return null;
+                    return Collections.emptyList();
                 }
                 classLoader = plugin.getServiceClassLoader() != null
                         ? plugin.getServiceClassLoader() : plugin.getPluginClassLoader();

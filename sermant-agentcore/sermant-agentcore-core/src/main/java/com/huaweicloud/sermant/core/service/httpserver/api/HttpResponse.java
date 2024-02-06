@@ -25,15 +25,16 @@ import java.util.Map;
  * @since 2024-02-02
  */
 public interface HttpResponse {
-
     /**
      * 获取响应状态码
+     *
      * @return 响应状态码
      */
     int status();
 
     /**
      * 设置响应状态码
+     *
      * @param status 响应状态码
      * @return 响应对象
      */
@@ -41,6 +42,7 @@ public interface HttpResponse {
 
     /**
      * 添加响应头
+     *
      * @param name 头部名称
      * @param value 头部值
      * @return 响应对象
@@ -49,6 +51,7 @@ public interface HttpResponse {
 
     /**
      * 设置响应头
+     *
      * @param name 头部名称
      * @param value 头部值
      * @return 响应对象
@@ -57,6 +60,7 @@ public interface HttpResponse {
 
     /**
      * 设置响应头集合
+     *
      * @param headers 响应头集合
      * @return 响应对象
      */
@@ -64,6 +68,7 @@ public interface HttpResponse {
 
     /**
      * 设置响应内容类型
+     *
      * @param contentType 内容类型
      * @return 响应对象
      */
@@ -71,6 +76,7 @@ public interface HttpResponse {
 
     /**
      * 设置响应内容长度
+     *
      * @param size 内容长度
      * @return 响应对象
      */
@@ -78,32 +84,36 @@ public interface HttpResponse {
 
     /**
      * 写入响应体（字节数组）
+     *
      * @param bytes 字节数组
      */
     void writeBody(byte[] bytes);
 
     /**
      * 写入响应体（字符串）
+     *
      * @param str 字符串
      */
     void writeBody(String str);
 
     /**
      * 写入响应体（异常）
+     *
      * @param ex 异常对象
      */
     void writeBody(Throwable ex);
 
     /**
      * 写入响应体（JSON字符串）
+     *
      * @param json JSON字符串
      */
     void writeBodyAsJson(String json);
 
     /**
      * 写入响应体（JSON对象）
+     *
      * @param obj JSON对象
      */
     void writeBodyAsJson(Object obj);
-
 }

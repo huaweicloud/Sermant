@@ -31,6 +31,7 @@ import com.sun.net.httpserver.HttpServer;
 import org.kohsuke.MetaInfServices;
 
 import java.net.InetSocketAddress;
+import java.util.Optional;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -78,11 +79,11 @@ public class SimpleHttpServerProvider implements HttpServerProvider {
             HttpRequest request = new SimpleHttpRequest(exchange);
             HttpResponse response = new SimpleHttpResponse(exchange);
             try {
-                HttpRouteHandler handler = HttpRouteHandlerManager.getHandler(request);
-                if (handler == null) {
+                Optional<HttpRouteHandler> handlerOptional = HttpRouteHandlerManager.getHandler(request);
+                if (!handlerOptional.isPresent()) {
                     throw new HttpServerException(Constants.NOT_FOUND_STATUS, "Not Found");
                 }
-                handler.handle(request, response);
+                handlerOptional.get().handle(request, response);
             } catch (HttpServerException e) {
                 response.status(e.getStatus());
                 if (e.getStatus() < Constants.SERVER_ERROR_STATUS) {

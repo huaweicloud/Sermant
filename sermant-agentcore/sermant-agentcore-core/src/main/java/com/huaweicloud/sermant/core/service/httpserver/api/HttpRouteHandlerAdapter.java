@@ -34,11 +34,11 @@ public abstract class HttpRouteHandlerAdapter implements HttpRouteHandler {
     }
 
     /**
-     * 执行具体的处理逻辑
+     * 执行处理请求的方法。
      *
+     * @param <T> 泛型类型
      * @param request HTTP请求对象
-     * @return 处理结果
-     * @throws Exception 如果处理过程中发生异常
+     * @return 处理请求后的结果对象
      */
     public abstract <T> ResponseResult<T> doHandle(HttpRequest request);
 }
