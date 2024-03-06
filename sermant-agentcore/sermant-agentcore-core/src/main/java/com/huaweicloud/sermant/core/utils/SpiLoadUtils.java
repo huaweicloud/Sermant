@@ -50,8 +50,8 @@ public class SpiLoadUtils {
         for (T service : services) {
             list.add(service);
         }
-        list.sort(Comparator.comparingInt(o -> {
-            SpiWeight weight = o.getClass().getAnnotation(SpiWeight.class);
+        list.sort(Comparator.comparingInt(obj -> {
+            SpiWeight weight = obj.getClass().getAnnotation(SpiWeight.class);
             return weight.value();
         }));
         return list;

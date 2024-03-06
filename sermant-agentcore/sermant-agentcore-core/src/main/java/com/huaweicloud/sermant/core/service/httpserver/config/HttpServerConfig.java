@@ -31,7 +31,10 @@ public class HttpServerConfig implements BaseConfig {
     private static final int DEFAULT_PORT = 47128;
 
     /**
-     * HTTP Server 类型
+     * HTTP Server 类型, 支持扩展为其他HTTP服务器
+     * <p>
+     *     simple: JDK内置的一个轻量级HTTP服务器
+     * </p>
      */
     private String type = "simple";
 

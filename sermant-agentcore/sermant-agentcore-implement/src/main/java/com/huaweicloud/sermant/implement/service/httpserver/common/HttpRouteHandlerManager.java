@@ -19,6 +19,7 @@ package com.huaweicloud.sermant.implement.service.httpserver.common;
 import com.huaweicloud.sermant.core.classloader.ClassLoaderManager;
 import com.huaweicloud.sermant.core.plugin.Plugin;
 import com.huaweicloud.sermant.core.plugin.PluginManager;
+import com.huaweicloud.sermant.core.service.httpserver.annotation.HttpRouteMapping;
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpRequest;
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpRouteHandler;
 import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
@@ -91,6 +92,7 @@ public class HttpRouteHandlerManager {
             }
             ClassLoader classLoader;
             if (SERMANT_PLUGIN_NAME.equals(pluginName)) {
+                // sermant core 支持对外提供http api 能力
                 classLoader = ClassLoaderManager.getFrameworkClassLoader();
             } else {
                 Plugin plugin = PluginManager.getPluginMap().get(pluginName);
@@ -110,16 +112,20 @@ public class HttpRouteHandlerManager {
     private void addRouteHandlers(String pluginName, ClassLoader classLoader) {
         for (HttpRouteHandler handler : ServiceLoader.load(HttpRouteHandler.class, classLoader)) {
             List<HttpRouter> routers = routersMapping.computeIfAbsent(pluginName, list -> new ArrayList<>());
-            routers.add(new HttpRouter(pluginName, handler));
+            HttpRouteMapping annotation = handler.getClass().getAnnotation(HttpRouteMapping.class);
+            if (annotation == null) {
+                continue;
+            }
+            routers.add(new HttpRouter(pluginName, handler, annotation));
         }
     }
 
     private String getPluginName(HttpRequest request) {
-        String path = request.path();
+        String path = request.getPath();
         String[] array = path.split("/");
         if (array.length < HTTP_PATH_SIZE) {
             throw new HttpServerException(Constants.BAD_REQUEST_STATUS,
-                    "Bad Request: 请求的 path[" + request.originalPath() + "] 格式不对");
+                    "Bad Request: The format of the requested path [" + request.getOriginalPath() + "] is incorrect");
         }
         return array[1];
     }

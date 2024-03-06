@@ -30,7 +30,7 @@ public interface HttpResponse {
      *
      * @return 响应状态码
      */
-    int status();
+    int getStatus();
 
     /**
      * 设置响应状态码
@@ -38,7 +38,7 @@ public interface HttpResponse {
      * @param status 响应状态码
      * @return 响应对象
      */
-    HttpResponse status(int status);
+    HttpResponse setStatus(int status);
 
     /**
      * 添加响应头
@@ -72,7 +72,7 @@ public interface HttpResponse {
      * @param contentType 内容类型
      * @return 响应对象
      */
-    HttpResponse contentType(String contentType);
+    HttpResponse setContentType(String contentType);
 
     /**
      * 设置响应内容长度
@@ -80,7 +80,7 @@ public interface HttpResponse {
      * @param size 内容长度
      * @return 响应对象
      */
-    HttpResponse contentLength(long size);
+    HttpResponse setContentLength(long size);
 
     /**
      * 写入响应体（字节数组）

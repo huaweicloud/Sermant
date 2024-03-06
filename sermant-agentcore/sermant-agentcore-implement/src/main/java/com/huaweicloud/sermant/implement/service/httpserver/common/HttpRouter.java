@@ -46,8 +46,7 @@ public class HttpRouter {
      * @param pluginName 插件名称
      * @param handler HttpRouteHandler对象
      */
-    public HttpRouter(String pluginName, HttpRouteHandler handler) {
-        HttpRouteMapping annotation = handler.getClass().getAnnotation(HttpRouteMapping.class);
+    public HttpRouter(String pluginName, HttpRouteHandler handler, HttpRouteMapping annotation) {
         this.path = buildPath(pluginName, annotation.path());
         this.pattern = Pattern.compile(exprCompile(this.path), Pattern.CASE_INSENSITIVE);
         this.method = annotation.method();
@@ -71,13 +70,13 @@ public class HttpRouter {
      * @return 如果请求匹配则返回true，否则返回false
      */
     public boolean match(HttpRequest request) {
-        if (!matchPath(request.path())) {
+        if (!matchPath(request.getPath())) {
             return false;
         }
         if (HttpMethod.ALL.name().equals(method.name())) {
             return true;
         }
-        if (method.name().equals(request.method())) {
+        if (method.name().equals(request.getMethod())) {
             return true;
         }
         throw new HttpMethodNotAllowedException("Method Not Allowed");

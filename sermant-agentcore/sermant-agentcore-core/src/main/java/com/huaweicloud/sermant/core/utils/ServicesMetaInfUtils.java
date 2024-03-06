@@ -34,7 +34,6 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -49,7 +48,6 @@ import javax.tools.StandardLocation;
  * @author zwmagic
  * @since 2024-02-03
  */
-@SupportedSourceVersion(value = SourceVersion.RELEASE_8)
 @MetaInfServices(Processor.class)
 public class ServicesMetaInfUtils extends AbstractProcessor {
     private static final String ANNOTATION =
@@ -92,9 +90,6 @@ public class ServicesMetaInfUtils extends AbstractProcessor {
             Set<String> services = new TreeSet<>();
             for (Element element : roundEnv.getElementsAnnotatedWith(HttpRouteMapping.class)) {
                 HttpRouteMapping annotation = element.getAnnotation(HttpRouteMapping.class);
-                if (annotation == null) {
-                    continue;
-                }
                 if (!element.getKind().isClass() && !element.getKind().isInterface()) {
                     continue;
                 }
@@ -107,7 +102,7 @@ public class ServicesMetaInfUtils extends AbstractProcessor {
         return false;
     }
 
-    private void writeToMetaInf(String contact, Set<String> services) {
+    private void writeToMetaInf(String fileName, Set<String> services) {
         if (services.isEmpty()) {
             return;
         }
@@ -115,9 +110,9 @@ public class ServicesMetaInfUtils extends AbstractProcessor {
         Filer filer = processingEnv.getFiler();
         PrintWriter pw = null;
         try {
-            String fileName = getResourceFileName(contact);
-            messager.printMessage(Diagnostic.Kind.NOTE, "Writing " + fileName);
-            FileObject fo = filer.createResource(StandardLocation.CLASS_OUTPUT, "", fileName);
+            String filePath = getResourceFileName(fileName);
+            messager.printMessage(Diagnostic.Kind.NOTE, "Writing " + filePath);
+            FileObject fo = filer.createResource(StandardLocation.CLASS_OUTPUT, "", filePath);
             pw = new PrintWriter(new OutputStreamWriter(fo.openOutputStream(), StandardCharsets.UTF_8));
 
             for (String service : services) {

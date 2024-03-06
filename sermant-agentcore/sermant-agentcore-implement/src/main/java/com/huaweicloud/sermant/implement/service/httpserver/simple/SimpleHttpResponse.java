@@ -49,12 +49,12 @@ public class SimpleHttpResponse implements HttpResponse {
     }
 
     @Override
-    public int status() {
+    public int getStatus() {
         return status;
     }
 
     @Override
-    public HttpResponse status(int code) {
+    public HttpResponse setStatus(int code) {
         this.status = code;
         return this;
     }
@@ -80,7 +80,7 @@ public class SimpleHttpResponse implements HttpResponse {
     }
 
     @Override
-    public HttpResponse contentType(String contentType) {
+    public HttpResponse setContentType(String contentType) {
         if (!contentType.contains(";")) {
             setHeader("Content-Type", contentType + ";charset=" + StandardCharsets.UTF_8);
             return this;
@@ -90,7 +90,7 @@ public class SimpleHttpResponse implements HttpResponse {
     }
 
     @Override
-    public HttpResponse contentLength(long size) {
+    public HttpResponse setContentLength(long size) {
         setHeader("Content-Length", String.valueOf(size));
         return this;
     }
@@ -124,13 +124,13 @@ public class SimpleHttpResponse implements HttpResponse {
     @Override
     public void writeBody(String str) {
         byte[] bytes = str == null ? new byte[0] : str.getBytes(StandardCharsets.UTF_8);
-        contentLength(bytes.length);
+        setContentLength(bytes.length);
         writeBody(bytes);
     }
 
     @Override
     public void writeBodyAsJson(String json) {
-        contentType("application/json;charset=utf-8");
+        setContentType("application/json;charset=utf-8");
         writeBody(json);
     }
 

@@ -85,14 +85,14 @@ public class SimpleHttpServerProvider implements HttpServerProvider {
                 }
                 handlerOptional.get().handle(request, response);
             } catch (HttpServerException e) {
-                response.status(e.getStatus());
+                response.setStatus(e.getStatus());
                 if (e.getStatus() < Constants.SERVER_ERROR_STATUS) {
                     response.writeBody(e.getMessage());
                 } else {
                     response.writeBody(e);
                 }
             } catch (Exception e) {
-                response.status(Constants.SERVER_ERROR_STATUS);
+                response.setStatus(Constants.SERVER_ERROR_STATUS);
                 response.writeBody(e);
             }
         });

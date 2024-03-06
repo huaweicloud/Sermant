@@ -74,18 +74,18 @@ public class SimpleHttpRequest implements HttpRequest {
     }
 
     @Override
-    public String path() {
+    public String getPath() {
         if (path != null) {
             return path;
         }
-        String[] array = originalPath().split(Constants.HTTP_PATH_DIVIDER);
+        String[] array = getOriginalPath().split(Constants.HTTP_PATH_DIVIDER);
         List<String> phases = Stream.of(array).filter(phase -> !phase.isEmpty()).collect(Collectors.toList());
         path = Constants.HTTP_PATH_DIVIDER + String.join(Constants.HTTP_PATH_DIVIDER, phases);
         return path;
     }
 
     @Override
-    public String originalPath() {
+    public String getOriginalPath() {
         if (originalPath != null) {
             return originalPath;
         }
@@ -95,12 +95,12 @@ public class SimpleHttpRequest implements HttpRequest {
     }
 
     @Override
-    public String method() {
+    public String getMethod() {
         return exchange.getRequestMethod();
     }
 
     @Override
-    public String contentType() {
+    public String getContentType() {
         return getFirstHeader("Content-Type");
     }
 
@@ -131,17 +131,17 @@ public class SimpleHttpRequest implements HttpRequest {
     }
 
     @Override
-    public String param(String name) {
-        return params().get(name);
+    public String getParam(String name) {
+        return getParams().get(name);
     }
 
     @Override
-    public String param(String name, String def) {
-        return params().getOrDefault(name, def);
+    public String getParam(String name, String def) {
+        return getParams().getOrDefault(name, def);
     }
 
     @Override
-    public Map<String, String> params() {
+    public Map<String, String> getParams() {
         URI requestedUri = exchange.getRequestURI();
         String query = requestedUri.getRawQuery();
         if (StringUtils.isEmpty(query)) {
@@ -165,19 +165,19 @@ public class SimpleHttpRequest implements HttpRequest {
     }
 
     @Override
-    public String body() throws HttpServerException {
-        return body(StandardCharsets.UTF_8);
+    public String getBody() throws HttpServerException {
+        return getBody(StandardCharsets.UTF_8);
     }
 
     /**
      * 获取body内容
      */
     @Override
-    public String body(Charset charset) throws HttpServerException {
+    public String getBody(Charset charset) throws HttpServerException {
         StringBuilder body = new StringBuilder();
         BufferedReader reader = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(bodyAsStream(), charset));
+            reader = new BufferedReader(new InputStreamReader(getBodyAsStream(), charset));
             String line;
             while ((line = reader.readLine()) != null) {
                 body.append(line);
@@ -197,20 +197,20 @@ public class SimpleHttpRequest implements HttpRequest {
     }
 
     @Override
-    public <T> T body(Class<T> clazz) throws HttpServerException {
-        String body = body();
+    public <T> T getBody(Class<T> clazz) throws HttpServerException {
+        String body = getBody();
         return JSONObject.parseObject(body, clazz);
     }
 
     @Override
-    public <T> List<T> bodyAsList(Class<T> clazz) throws HttpServerException {
-        String body = body();
+    public <T> List<T> getBodyAsList(Class<T> clazz) throws HttpServerException {
+        String body = getBody();
         return JSON.parseArray(body, clazz);
     }
 
     @Override
-    public byte[] bodyAsBytes() throws HttpServerException {
-        try (InputStream ins = bodyAsStream()) {
+    public byte[] getBodyAsBytes() throws HttpServerException {
+        try (InputStream ins = getBodyAsStream()) {
             if (ins == null) {
                 return new byte[0];
             }
@@ -227,7 +227,7 @@ public class SimpleHttpRequest implements HttpRequest {
     }
 
     @Override
-    public InputStream bodyAsStream() {
+    public InputStream getBodyAsStream() {
         return exchange.getRequestBody();
     }
 }

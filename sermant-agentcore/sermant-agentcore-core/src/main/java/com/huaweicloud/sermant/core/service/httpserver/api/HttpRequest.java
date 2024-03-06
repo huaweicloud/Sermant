@@ -43,28 +43,28 @@ public interface HttpRequest {
      *
      * @return 请求的path
      */
-    String path();
+    String getPath();
 
     /**
      * 原始的请求path
      *
      * @return 请求的path
      */
-    String originalPath();
+    String getOriginalPath();
 
     /**
      * HTTP 方法
      *
      * @return HttpMethod，如 GET POST等
      */
-    String method();
+    String getMethod();
 
     /**
      * 获取内容类型。
      *
      * @return 内容类型
      */
-    String contentType();
+    String getContentType();
 
     /**
      * 获取IP地址。
@@ -106,7 +106,7 @@ public interface HttpRequest {
      * @param name 参数名
      * @return 返回指定name的参数
      */
-    String param(String name);
+    String getParam(String name);
 
     /**
      * 指定name的参数
@@ -118,7 +118,7 @@ public interface HttpRequest {
      * @param defaultValue 当值是null时，返回默认值
      * @return 返回指定name的参数
      */
-    String param(String name, String defaultValue);
+    String getParam(String name, String defaultValue);
 
     /**
      * 指定name的参数
@@ -128,7 +128,7 @@ public interface HttpRequest {
      *
      * @return 返回指定name的参数
      */
-    Map<String, String> params();
+    Map<String, String> getParams();
 
     /**
      * 获取请求的主体内容。
@@ -136,7 +136,7 @@ public interface HttpRequest {
      * @return 请求的主体内容
      * @throws HttpServerException 如果发生HTTP服务异常
      */
-    String body() throws HttpServerException;
+    String getBody() throws HttpServerException;
 
     /**
      * 从请求体中解析出指定类型的对象。
@@ -146,7 +146,7 @@ public interface HttpRequest {
      * @return 解析出的对象
      * @throws HttpServerException 如果发生HTTP服务异常
      */
-    <T> T body(Class<T> clazz) throws HttpServerException;
+    <T> T getBody(Class<T> clazz) throws HttpServerException;
 
     /**
      * 获取请求的主体内容。
@@ -155,7 +155,7 @@ public interface HttpRequest {
      * @return 请求的主体内容
      * @throws HttpServerException 如果发生HTTP服务异常
      */
-    String body(Charset charset) throws HttpServerException;
+    String getBody(Charset charset) throws HttpServerException;
 
     /**
      * 将请求体转换为字节数组。
@@ -163,7 +163,7 @@ public interface HttpRequest {
      * @return 请求体的字节数组
      * @throws HttpServerException 如果发生HTTP服务异常
      */
-    byte[] bodyAsBytes() throws HttpServerException;
+    byte[] getBodyAsBytes() throws HttpServerException;
 
     /**
      * 从请求体中解析出指定类型的对象列表。
@@ -173,12 +173,12 @@ public interface HttpRequest {
      * @return 解析出的对象列表
      * @throws HttpServerException 如果发生HTTP服务异常
      */
-    <T> List<T> bodyAsList(Class<T> clazz) throws HttpServerException;
+    <T> List<T> getBodyAsList(Class<T> clazz) throws HttpServerException;
 
     /**
      * 获取请求体的输入流。
      *
      * @return 请求体的输入流
      */
-    InputStream bodyAsStream();
+    InputStream getBodyAsStream();
 }
