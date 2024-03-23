@@ -23,8 +23,9 @@ import com.huaweicloud.sermant.core.service.httpserver.api.HttpRouteHandler;
 import com.huaweicloud.sermant.core.service.httpserver.config.HttpServerConfig;
 import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
 import com.huaweicloud.sermant.implement.service.httpserver.HttpServerProvider;
-import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
+import com.huaweicloud.sermant.implement.service.httpserver.common.HttpCodeEnum;
 import com.huaweicloud.sermant.implement.service.httpserver.common.HttpRouteHandlerManager;
+import com.huaweicloud.sermant.implement.service.httpserver.common.HttpServerTypeEnum;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -52,7 +53,7 @@ public class SimpleHttpServerProvider implements HttpServerProvider {
 
     @Override
     public String getType() {
-        return Constants.SIMPLE_HTTP_SERVER_TYPE;
+        return HttpServerTypeEnum.SIMPLE.getType();
     }
 
     @Override
@@ -81,18 +82,19 @@ public class SimpleHttpServerProvider implements HttpServerProvider {
             try {
                 Optional<HttpRouteHandler> handlerOptional = HttpRouteHandlerManager.getHandler(request);
                 if (!handlerOptional.isPresent()) {
-                    throw new HttpServerException(Constants.NOT_FOUND_STATUS, "Not Found");
+                    throw new HttpServerException(HttpCodeEnum.NOT_FOUND.getCode(),
+                            HttpCodeEnum.NOT_FOUND.getMessage());
                 }
                 handlerOptional.get().handle(request, response);
             } catch (HttpServerException e) {
                 response.setStatus(e.getStatus());
-                if (e.getStatus() < Constants.SERVER_ERROR_STATUS) {
+                if (e.getStatus() < HttpCodeEnum.SERVER_ERROR.getCode()) {
                     response.writeBody(e.getMessage());
                 } else {
                     response.writeBody(e);
                 }
             } catch (Exception e) {
-                response.setStatus(Constants.SERVER_ERROR_STATUS);
+                response.setStatus(HttpCodeEnum.SERVER_ERROR.getCode());
                 response.writeBody(e);
             }
         });

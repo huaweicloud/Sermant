@@ -17,7 +17,7 @@
 package com.huaweicloud.sermant.implement.service.httpserver.exception;
 
 import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
-import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
+import com.huaweicloud.sermant.implement.service.httpserver.common.HttpCodeEnum;
 
 /**
  * 表示请求方法不允许的异常情况
@@ -33,6 +33,6 @@ public class HttpMethodNotAllowedException extends HttpServerException {
      * @param message 异常信息
      */
     public HttpMethodNotAllowedException(String message) {
-        super(Constants.METHOD_NOT_ALLOWED_STATUS, message);
+        super(HttpCodeEnum.METHOD_NOT_ALLOWED.getCode(), message);
     }
 }

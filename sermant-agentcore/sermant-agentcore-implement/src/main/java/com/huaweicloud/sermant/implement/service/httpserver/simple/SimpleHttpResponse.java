@@ -19,11 +19,11 @@ package com.huaweicloud.sermant.implement.service.httpserver.simple;
 import com.huaweicloud.sermant.core.service.httpserver.api.HttpResponse;
 import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerException;
 import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
+import com.huaweicloud.sermant.implement.service.httpserver.common.HttpCodeEnum;
 
 import com.alibaba.fastjson.JSON;
 import com.sun.net.httpserver.HttpExchange;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -37,7 +37,7 @@ import java.util.Map;
 public class SimpleHttpResponse implements HttpResponse {
     private final HttpExchange exchange;
 
-    private int status = Constants.SUCCESS_STATUS;
+    private int status = HttpCodeEnum.SUCCESS.getCode();
 
     /**
      * 构造函数，用于创建一个SimpleHttpResponse对象。
@@ -82,16 +82,16 @@ public class SimpleHttpResponse implements HttpResponse {
     @Override
     public HttpResponse setContentType(String contentType) {
         if (!contentType.contains(";")) {
-            setHeader("Content-Type", contentType + ";charset=" + StandardCharsets.UTF_8);
+            setHeader(Constants.CONTENT_TYPE, contentType + ";charset=" + StandardCharsets.UTF_8);
             return this;
         }
-        setHeader("Content-Type", contentType);
+        setHeader(Constants.CONTENT_TYPE, contentType);
         return this;
     }
 
     @Override
     public HttpResponse setContentLength(long size) {
-        setHeader("Content-Length", String.valueOf(size));
+        setHeader(Constants.CONTENT_LENGTH, String.valueOf(size));
         return this;
     }
 
@@ -102,22 +102,11 @@ public class SimpleHttpResponse implements HttpResponse {
 
     @Override
     public void writeBody(byte[] bytes) {
-        OutputStream out = null;
-        try {
+        try (OutputStream out = exchange.getResponseBody()) {
             exchange.sendResponseHeaders(status, bytes.length);
-            out = exchange.getResponseBody();
             out.write(bytes);
-            exchange.close();
-        } catch (IOException ex) {
-            throw new HttpServerException(Constants.SERVER_ERROR_STATUS, ex);
-        } finally {
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
-                }
-            }
+        } catch (Exception ex) {
+            throw new HttpServerException(HttpCodeEnum.SERVER_ERROR.getCode(), ex);
         }
     }
 

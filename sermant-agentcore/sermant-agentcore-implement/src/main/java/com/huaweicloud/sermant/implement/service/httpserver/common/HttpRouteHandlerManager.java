@@ -111,11 +111,11 @@ public class HttpRouteHandlerManager {
 
     private void addRouteHandlers(String pluginName, ClassLoader classLoader) {
         for (HttpRouteHandler handler : ServiceLoader.load(HttpRouteHandler.class, classLoader)) {
-            List<HttpRouter> routers = routersMapping.computeIfAbsent(pluginName, list -> new ArrayList<>());
             HttpRouteMapping annotation = handler.getClass().getAnnotation(HttpRouteMapping.class);
             if (annotation == null) {
                 continue;
             }
+            List<HttpRouter> routers = routersMapping.computeIfAbsent(pluginName, list -> new ArrayList<>());
             routers.add(new HttpRouter(pluginName, handler, annotation));
         }
     }
@@ -124,7 +124,7 @@ public class HttpRouteHandlerManager {
         String path = request.getPath();
         String[] array = path.split("/");
         if (array.length < HTTP_PATH_SIZE) {
-            throw new HttpServerException(Constants.BAD_REQUEST_STATUS,
+            throw new HttpServerException(HttpCodeEnum.BAD_REQUEST.getCode(),
                     "Bad Request: The format of the requested path [" + request.getOriginalPath() + "] is incorrect");
         }
         return array[1];

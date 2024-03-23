@@ -17,35 +17,33 @@
 package com.huaweicloud.sermant.implement.service.httpserver.common;
 
 /**
- * 常量
- *
+ * HTTP服务器类型枚举
  * @author zwmagic
- * @since 2024-02-02
  */
-public class Constants {
+public enum HttpServerTypeEnum {
     /**
-     * 默认编码
+     * 简单服务器类型, 使用JDK自带的Http Server
      */
-    public static final String DEFAULT_ENCODE = "UTF-8";
+    SIMPLE("simple");
 
     /**
-     * 指示HTTP消息体的MIME类型和编码格式的头部字段名
+     * 类型标识
      */
-    public static final String CONTENT_TYPE = "Content-Type";
+    private final String type;
 
     /**
-     *  指示HTTP消息体的大小，以字节为单位的头部字段名
+     *  枚举构造函数
+     * @param type 枚举类型的字符串标识
      */
-    public static final String CONTENT_LENGTH = "Content-Length";
+    HttpServerTypeEnum(String type) {
+        this.type = type;
+    }
 
     /**
-     * HTTP路径分隔符
+     * 获取枚举类型的字符串标识
+     * @return 类型标识字符串
      */
-    public static final String HTTP_PATH_DIVIDER = "/";
-
-    /**
-     * 私有构造方法，防止外部实例化
-     */
-    private Constants() {
+    public String getType() {
+        return type;
     }
 }

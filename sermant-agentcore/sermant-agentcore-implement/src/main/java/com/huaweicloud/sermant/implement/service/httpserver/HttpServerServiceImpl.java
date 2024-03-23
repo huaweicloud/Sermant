@@ -22,7 +22,7 @@ import com.huaweicloud.sermant.core.service.BaseService;
 import com.huaweicloud.sermant.core.service.httpserver.HttpServerService;
 import com.huaweicloud.sermant.core.service.httpserver.config.HttpServerConfig;
 import com.huaweicloud.sermant.core.utils.SpiLoadUtils;
-import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
+import com.huaweicloud.sermant.implement.service.httpserver.common.HttpServerTypeEnum;
 
 import org.kohsuke.MetaInfServices;
 
@@ -49,12 +49,13 @@ public class HttpServerServiceImpl implements HttpServerService {
                 .collect(Collectors.toMap(HttpServerProvider::getType, provider -> provider));
         this.httpServerProvider = providerMap.get(ConfigManager.getConfig(HttpServerConfig.class).getType());
         if (this.httpServerProvider == null) {
-            this.httpServerProvider = providerMap.get(Constants.SIMPLE_HTTP_SERVER_TYPE);
+            this.httpServerProvider = providerMap.get(HttpServerTypeEnum.SIMPLE.getType());
             LOGGER.warning("can not find httpserver provider, use simple httpserver provider");
         }
         try {
             this.httpServerProvider.start();
         } catch (Exception e) {
+            LOGGER.warning("HttpServerService start failed, " + e.getMessage());
             throw new RuntimeException(e);
         }
         LOGGER.info("HttpServerService started.");
@@ -68,6 +69,7 @@ public class HttpServerServiceImpl implements HttpServerService {
         try {
             this.httpServerProvider.stop();
         } catch (Exception e) {
+            LOGGER.warning("HttpServerService stop failed, " + e.getMessage());
             throw new RuntimeException(e);
         }
         LOGGER.info("HttpServerService stopped.");

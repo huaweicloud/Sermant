@@ -21,6 +21,7 @@ import com.huaweicloud.sermant.core.service.httpserver.exception.HttpServerExcep
 import com.huaweicloud.sermant.core.utils.CollectionUtils;
 import com.huaweicloud.sermant.core.utils.StringUtils;
 import com.huaweicloud.sermant.implement.service.httpserver.common.Constants;
+import com.huaweicloud.sermant.implement.service.httpserver.common.HttpCodeEnum;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -175,23 +176,14 @@ public class SimpleHttpRequest implements HttpRequest {
     @Override
     public String getBody(Charset charset) throws HttpServerException {
         StringBuilder body = new StringBuilder();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(getBodyAsStream(), charset));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getBodyAsStream(), charset))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 body.append(line);
             }
-        } catch (Exception e) {
-            throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
-                }
-            }
+        } catch (IOException e) {
+            throw new HttpServerException(HttpCodeEnum.SERVER_ERROR.getCode(),
+                    "Failed to read the body due to an IO error.", e);
         }
         return body.toString();
     }
@@ -222,7 +214,7 @@ public class SimpleHttpRequest implements HttpRequest {
             }
             return outs.toByteArray();
         } catch (Exception e) {
-            throw new HttpServerException(Constants.SERVER_ERROR_STATUS, e);
+            throw new HttpServerException(HttpCodeEnum.SERVER_ERROR.getCode(), e);
         }
     }
 
