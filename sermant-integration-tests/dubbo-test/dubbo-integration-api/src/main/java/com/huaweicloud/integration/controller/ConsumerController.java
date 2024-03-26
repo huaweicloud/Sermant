@@ -35,7 +35,10 @@ import org.springframework.web.client.RestTemplate;
 public class ConsumerController {
     private static final String PROVIDER_URL = "http://dubbo-integration-provider/hello";
 
-    @Autowired
+    /**
+     * dubbo3.x暂时无法实现dubbo、spring同时注册，spring场景暂时不引入测试，加required完成兼容
+     */
+    @Autowired(required = false)
     private ProviderClient client;
 
     @Autowired

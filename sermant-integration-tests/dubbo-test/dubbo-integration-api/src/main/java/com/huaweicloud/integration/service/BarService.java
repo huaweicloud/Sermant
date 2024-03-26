@@ -16,6 +16,8 @@
 
 package com.huaweicloud.integration.service;
 
+import java.util.Map;
+
 /**
  * 测试接口
  *
@@ -30,4 +32,11 @@ public interface BarService {
      * @return 测试信息
      */
     String bar(String str);
+
+    /**
+     * dubbo3.0.0 3.0.3获取attachments
+     *
+     * @return attachments
+     */
+    Map<String, Object> getAttachments();
 }

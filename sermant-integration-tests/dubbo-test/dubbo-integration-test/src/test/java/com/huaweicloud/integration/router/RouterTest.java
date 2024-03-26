@@ -25,7 +25,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Objects;
@@ -56,11 +55,17 @@ public class RouterTest {
     private static final String GLOBAL_KEY = "servicecomb.globalRouteRule";
 
     /**
+     * 增加环境变量，控制dubbo3场景暂时不测试spring场景
+     */
+    private final boolean isExecuteSpringTest;
+
+    /**
      * 构造方法
      */
     public RouterTest() throws InterruptedException {
         testTagRouterBaseUrl =
                 "http://127.0.0.1:" + System.getProperty("controller.port", "28019") + "/controller/getMetadataBy";
+        isExecuteSpringTest = Boolean.parseBoolean(System.getProperty("execute.spring.test", "true"));
         clearConfig();
     }
 
@@ -69,6 +74,9 @@ public class RouterTest {
      */
     @Test
     public void testRouter() throws InterruptedException {
+        if (!isExecuteSpringTest) {
+            return;
+        }
         HttpHeaders headers = new HttpHeaders();
 
         // 测试命中Test-Env:env-001的实例
@@ -407,11 +415,13 @@ public class RouterTest {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
+            }
         }
 
         // 测试命中version:1.0.1的实例
@@ -422,11 +432,13 @@ public class RouterTest {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.1"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.1"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.1"));
+            }
         }
 
         // 测试没有命中version:1.0.1的实例
@@ -438,13 +450,15 @@ public class RouterTest {
             String body = Objects.requireNonNull(exchange.getBody());
             Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            body = Objects.requireNonNull(exchange.getBody());
-            Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                body = Objects.requireNonNull(exchange.getBody());
+                Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            body = Objects.requireNonNull(exchange.getBody());
-            Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                body = Objects.requireNonNull(exchange.getBody());
+                Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
+            }
         }
 
         // 测试没有命中version:1.0.1的实例
@@ -455,14 +469,15 @@ public class RouterTest {
             String body = Objects.requireNonNull(exchange.getBody());
             Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                body = Objects.requireNonNull(exchange.getBody());
+                Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
 
-            body = Objects.requireNonNull(exchange.getBody());
-            Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
-
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            body = Objects.requireNonNull(exchange.getBody());
-            Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                body = Objects.requireNonNull(exchange.getBody());
+                Assertions.assertTrue(!body.contains("1.0.1") && !body.contains("group-test:gray"));
+            }
         }
     }
 
@@ -506,11 +521,13 @@ public class RouterTest {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.0"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.0"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.0"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.0"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("1.0.0"));
+            }
         }
 
         // 下发tag匹配的路由规则
@@ -547,12 +564,13 @@ public class RouterTest {
         for (int i = 0; i < TIMES; i++) {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
-
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("group-test:gray"));
+            }
         }
     }
 
@@ -622,13 +640,15 @@ public class RouterTest {
             String body = Objects.requireNonNull(exchange.getBody());
             Assertions.assertTrue(body.contains("1.0.1") && body.contains("group-test:gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            body = Objects.requireNonNull(exchange.getBody());
-            Assertions.assertTrue(body.contains("1.0.1") && body.contains("group-test:gray"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                body = Objects.requireNonNull(exchange.getBody());
+                Assertions.assertTrue(body.contains("1.0.1") && body.contains("group-test:gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            body = Objects.requireNonNull(exchange.getBody());
-            Assertions.assertTrue(body.contains("1.0.1") && body.contains("group-test:gray"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                body = Objects.requireNonNull(exchange.getBody());
+                Assertions.assertTrue(body.contains("1.0.1") && body.contains("group-test:gray"));
+            }
         }
     }
 
@@ -663,11 +683,13 @@ public class RouterTest {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("gray"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("gray"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("gray"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("gray"));
+            }
         }
     }
 
@@ -705,11 +727,13 @@ public class RouterTest {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+            }
         }
     }
 
@@ -753,25 +777,30 @@ public class RouterTest {
             } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
                 dubboAZ2++;
             }
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            if (Objects.requireNonNull(exchange.getBody()).contains("az1")) {
-                feignAZ1++;
-            } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
-                feignAZ2++;
-            }
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            if (Objects.requireNonNull(exchange.getBody()).contains("az1")) {
-                restAZ1++;
-            } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
-                restAZ2++;
+
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                if (Objects.requireNonNull(exchange.getBody()).contains("az1")) {
+                    feignAZ1++;
+                } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
+                    feignAZ2++;
+                }
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                if (Objects.requireNonNull(exchange.getBody()).contains("az1")) {
+                    restAZ1++;
+                } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
+                    restAZ2++;
+                }
             }
         }
         Assertions.assertNotEquals(0, dubboAZ1);
         Assertions.assertNotEquals(0, dubboAZ2);
-        Assertions.assertNotEquals(0, feignAZ1);
-        Assertions.assertNotEquals(0, feignAZ2);
-        Assertions.assertNotEquals(0, restAZ1);
-        Assertions.assertNotEquals(0, restAZ2);
+        if (isExecuteSpringTest) {
+            Assertions.assertNotEquals(0, feignAZ1);
+            Assertions.assertNotEquals(0, feignAZ2);
+            Assertions.assertNotEquals(0, restAZ1);
+            Assertions.assertNotEquals(0, restAZ2);
+        }
     }
 
     /**
@@ -812,11 +841,13 @@ public class RouterTest {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+            }
         }
     }
 
@@ -863,25 +894,30 @@ public class RouterTest {
             } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
                 dubboAZ2++;
             }
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            if (Objects.requireNonNull(exchange.getBody()).contains("az1")) {
-                feignAZ1++;
-            } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
-                feignAZ2++;
-            }
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            if (Objects.requireNonNull(exchange.getBody()).contains("az1")) {
-                restAZ1++;
-            } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
-                restAZ2++;
+
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                if (Objects.requireNonNull(exchange.getBody()).contains("az1")) {
+                    feignAZ1++;
+                } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
+                    feignAZ2++;
+                }
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                if (Objects.requireNonNull(exchange.getBody()).contains("az1")) {
+                    restAZ1++;
+                } else if (Objects.requireNonNull(exchange.getBody()).contains("az2")) {
+                    restAZ2++;
+                }
             }
         }
         Assertions.assertNotEquals(0, dubboAZ1);
         Assertions.assertNotEquals(0, dubboAZ2);
-        Assertions.assertNotEquals(0, feignAZ1);
-        Assertions.assertNotEquals(0, feignAZ2);
-        Assertions.assertNotEquals(0, restAZ1);
-        Assertions.assertNotEquals(0, restAZ2);
+        if (isExecuteSpringTest) {
+            Assertions.assertNotEquals(0, feignAZ1);
+            Assertions.assertNotEquals(0, feignAZ2);
+            Assertions.assertNotEquals(0, restAZ1);
+            Assertions.assertNotEquals(0, restAZ2);
+        }
     }
 
     /**
@@ -922,11 +958,13 @@ public class RouterTest {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+            }
         }
     }
 
@@ -969,11 +1007,13 @@ public class RouterTest {
             exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Dubbo", HttpMethod.GET, entity, String.class);
             Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+            if (isExecuteSpringTest) {
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Feign", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
 
-            exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
-            Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+                exchange = REST_TEMPLATE.exchange(testTagRouterBaseUrl + "Rest", HttpMethod.GET, entity, String.class);
+                Assertions.assertTrue(Objects.requireNonNull(exchange.getBody()).contains("az1"));
+            }
         }
     }
 

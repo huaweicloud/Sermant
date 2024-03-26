@@ -74,9 +74,9 @@ public class TagKindHandlerTest extends AbstractKindHandlerTest {
      */
     @Test
     public void testShouldHandle() {
-        Assert.assertTrue(handler.shouldHandle(RouterConstant.TAG_KEY_PREFIX + ".foo", ""));
+        Assert.assertFalse(handler.shouldHandle(RouterConstant.TAG_KEY_PREFIX + ".foo"));
         Assert.assertFalse(
-                handler.shouldHandle(RouterConstant.TAG_KEY_PREFIX + ".foo", RouterConstant.TAG_MATCH_KIND));
+                handler.shouldHandle(RouterConstant.TAG_KEY_PREFIX + ".foo"));
     }
 
     /**

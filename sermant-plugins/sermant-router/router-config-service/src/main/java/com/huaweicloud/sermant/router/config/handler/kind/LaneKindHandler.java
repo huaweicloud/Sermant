@@ -43,8 +43,8 @@ public class LaneKindHandler extends AbstractKindHandler {
     }
 
     @Override
-    public boolean shouldHandle(String key, String content) {
-        return super.shouldHandle(key, content)
+    public boolean shouldHandle(String key) {
+        return super.shouldHandle(key)
                 && (keys.contains(key) || key.startsWith(RouterConstant.LANE_KEY_PREFIX + RouterConstant.POINT));
     }
 }

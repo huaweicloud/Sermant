@@ -18,8 +18,8 @@ package com.huaweicloud.integration.service;
 
 import com.huaweicloud.integration.client.ProviderClient;
 import com.huaweicloud.integration.constants.Constant;
+import com.huaweicloud.integration.utils.RpcContextUtils;
 
-import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.client.RestTemplate;
@@ -48,7 +48,7 @@ public class MetadataServiceImpl implements MetadataService {
 
     @Override
     public String getMetadataByDubbo() {
-        RpcContext.getContext().setAttachment(Constant.TAG_KEY, Constant.TAG);
+        RpcContextUtils.setContextTagToAttachment(Constant.TAG_KEY, Constant.TAG);
         return fooService.getMetadata(false);
     }
 

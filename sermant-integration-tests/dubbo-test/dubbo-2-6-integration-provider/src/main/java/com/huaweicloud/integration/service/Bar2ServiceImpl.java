@@ -16,6 +16,9 @@
 
 package com.huaweicloud.integration.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 测试接口
  *
@@ -26,5 +29,10 @@ public class Bar2ServiceImpl implements BarService {
     @Override
     public String bar(String str) {
         return "bar2:" + str;
+    }
+
+    @Override
+    public Map<String, Object> getAttachments() {
+        return new HashMap<>();
     }
 }

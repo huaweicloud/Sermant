@@ -70,31 +70,19 @@ jobs:
     strategy:
       matrix:
         dubbo-version: ['2-5','2-6','2-7']
-        dubbo-versions: ['0','1','2','3','4','5','6','7','8','9','10','11','12']
+        dubbo-versions: ['0','3','6','9','12']
         include:
-          - dubbo-version: '2-6'
-            dubbo-versions: '10.1'
-          - dubbo-version: '2-7'
-            dubbo-versions: '4.1'
-          - dubbo-version: '2-7'
-            dubbo-versions: '13'
-          - dubbo-version: '2-7'
-            dubbo-versions: '14'
+          - dubbo-version: '2-5'
+            dubbo-versions: '10'
           - dubbo-version: '2-7'
             dubbo-versions: '15'
         exclude:
           - dubbo-version: '2-5'
-            dubbo-versions: '11'
+            dubbo-versions: '9'
           - dubbo-version: '2-5'
             dubbo-versions: '12'
           - dubbo-version: '2-7'
-            dubbo-versions: '1'
-          - dubbo-version: '2-7'
-            dubbo-versions: '2'
-          - dubbo-version: '2-7'
             dubbo-versions: '3'
-          - dubbo-version: '2-7'
-            dubbo-versions: '4'
       fail-fast: false
     steps:
       - uses: actions/checkout@v3
@@ -123,3 +111,93 @@ jobs:
       - name: removal test for ${{ matrix.dubbo-version }}-${{ matrix.dubbo-versions }}
         if: env.enableRemoval == 'true'
         uses: ./.github/actions/scenarios/dubbo/removal
+  test-for-dubbo3:
+    name: Test for dubbo3.x
+    runs-on: ubuntu-latest
+    needs: [ download-midwares-and-cache, build-agent-and-cache ]
+    strategy:
+      matrix:
+        registry-model: [ 'all','interface','instance' ]
+        dubbo-version: [ '3-0','3-1','3-2' ]
+        dubbo-versions: [ '0','3','6','9','12' ]
+        include:
+          - dubbo-version: '3-0'
+            dubbo-versions: '15'
+            registry-model: 'all'
+          - dubbo-version: '3-0'
+            dubbo-versions: '15'
+            registry-model: 'interface'
+          - dubbo-version: '3-0'
+            dubbo-versions: '15'
+            registry-model: 'instance'
+          - dubbo-version: '3-1'
+            dubbo-versions: '11'
+            registry-model: 'all'
+          - dubbo-version: '3-1'
+            dubbo-versions: '11'
+            registry-model: 'interface'
+          - dubbo-version: '3-1'
+            dubbo-versions: '11'
+            registry-model: 'instance'
+          - dubbo-version: '3-2'
+            dubbo-versions: '11'
+            registry-model: 'all'
+          - dubbo-version: '3-2'
+            dubbo-versions: '11'
+            registry-model: 'interface'
+          - dubbo-version: '3-2'
+            dubbo-versions: '11'
+            registry-model: 'instance'
+        exclude:
+          - dubbo-version: '3-0'
+            dubbo-versions: '0'
+            registry-model: 'all'
+          - dubbo-version: '3-0'
+            dubbo-versions: '0'
+            registry-model: 'interface'
+          - dubbo-version: '3-0'
+            dubbo-versions: '0'
+            registry-model: 'instance'
+          - dubbo-version: '3-0'
+            dubbo-versions: '3'
+            registry-model: 'all'
+          - dubbo-version: '3-0'
+            dubbo-versions: '3'
+            registry-model: 'interface'
+          - dubbo-version: '3-0'
+            dubbo-versions: '3'
+            registry-model: 'instance'
+          - dubbo-version: '3-1'
+            dubbo-versions: '12'
+            registry-model: 'all'
+          - dubbo-version: '3-1'
+            dubbo-versions: '12'
+            registry-model: 'interface'
+          - dubbo-version: '3-1'
+            dubbo-versions: '12'
+            registry-model: 'instance'
+          - dubbo-version: '3-2'
+            dubbo-versions: '12'
+            registry-model: 'all'
+          - dubbo-version: '3-2'
+            dubbo-versions: '12'
+            registry-model: 'interface'
+          - dubbo-version: '3-2'
+            dubbo-versions: '12'
+            registry-model: 'instance'
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 100
+      - name: set java version to environment
+        run: |
+          echo "javaVersion=8" >> $GITHUB_ENV
+      - name: common operations
+        uses: ./.github/actions/common/dubbo
+      - name: (dubbo3.x router) test for ${{ matrix.dubbo-version }}-${{ matrix.dubbo-versions }}
+        if: env.enableDubboRouter == 'true'
+        uses: ./.github/actions/scenarios/dubbo/router-dubbo3
+      - name: (dubbo3.x lane) test for ${{ matrix.dubbo-version }}-${{ matrix.dubbo-versions }}
+        if: env.enableDubboLane == 'true'
+        uses: ./.github/actions/scenarios/dubbo/lane-dubbo3

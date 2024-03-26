@@ -39,8 +39,7 @@ public interface AbstractHandler {
      * 是否需要处理
      *
      * @param key 配置key
-     * @param content 配置内容
      * @return 是否需要处理
      */
-    boolean shouldHandle(String key, String content);
+    boolean shouldHandle(String key);
 }

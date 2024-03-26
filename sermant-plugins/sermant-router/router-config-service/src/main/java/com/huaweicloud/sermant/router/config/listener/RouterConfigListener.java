@@ -65,7 +65,7 @@ public class RouterConfigListener implements DynamicConfigListener {
     public void process(DynamicConfigEvent event) {
         String key = event.getKey();
         handlers.forEach(handler -> {
-            if (handler.shouldHandle(key, event.getContent())) {
+            if (handler.shouldHandle(key)) {
                 handler.handle(event, cacheName);
             }
         });

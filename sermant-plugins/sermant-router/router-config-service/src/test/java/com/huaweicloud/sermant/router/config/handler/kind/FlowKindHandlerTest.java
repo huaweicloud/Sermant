@@ -73,8 +73,8 @@ public class FlowKindHandlerTest extends AbstractKindHandlerTest {
      */
     @Test
     public void testShouldHandle() {
-        Assert.assertTrue(handler.shouldHandle(RouterConstant.GLOBAL_ROUTER_KEY, ""));
-        Assert.assertFalse(handler.shouldHandle(RouterConstant.GLOBAL_ROUTER_KEY, RouterConstant.FLOW_MATCH_KIND));
+        Assert.assertFalse(handler.shouldHandle(RouterConstant.GLOBAL_ROUTER_KEY));
+        Assert.assertFalse(handler.shouldHandle(RouterConstant.GLOBAL_ROUTER_KEY));
     }
 
     /**

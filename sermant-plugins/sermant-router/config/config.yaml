@@ -11,6 +11,8 @@ router.plugin:
   enabled-dubbo-zone-router: false
   # 是否初始化spring cloud区域路由，兼容性开关，开启后，会在spring cloud的配置缓存中初始化一条以zone匹配的同标签路由
   enabled-spring-zone-router: false
+  # compatibility router config 1.0, default is false not support
+  enabled-previous-rule: false
 transmit.plugin:
   # 是否在直接new Thread时传递标签
   enabled-thread: true

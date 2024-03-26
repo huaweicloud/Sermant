@@ -7,6 +7,8 @@ dubbo:
     # 模拟存量dubbo应用注册到zookeeper的情况，新开发的应用建议配置为 sc://127.0.0.1:30100
     address: zookeeper://127.0.0.1:2181
     protocol: zookeeper
+    # dubbo3.x注册类型支持interface/instance/all,默认为all
+    register-mode: ${DUBBO_REGISTRY_MODE:all}
 
 spring:
   application:

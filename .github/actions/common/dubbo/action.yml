@@ -56,6 +56,6 @@ runs:
       shell: bash
       run: echo "projectPath=2-6" >> $GITHUB_ENV
     - name: configuration for 2.7.x
-      if: matrix.dubbo-version == '2-7'
+      if: matrix.dubbo-version == '2-7' || matrix.dubbo-version == '3-0' || matrix.dubbo-version == '3-1' || matrix.dubbo-version == '3-2'
       shell: bash
       run: echo "projectPath=2-7" >> $GITHUB_ENV

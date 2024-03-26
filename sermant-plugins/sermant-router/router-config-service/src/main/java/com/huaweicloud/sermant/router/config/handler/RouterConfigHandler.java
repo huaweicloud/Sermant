@@ -77,8 +77,8 @@ public class RouterConfigHandler extends AbstractConfigHandler {
     }
 
     @Override
-    public boolean shouldHandle(String key, String content) {
-        return super.shouldHandle(key, content) && RouterConstant.ROUTER_KEY_PREFIX.equals(key);
+    public boolean shouldHandle(String key) {
+        return super.shouldHandle(key) && RouterConstant.ROUTER_KEY_PREFIX.equals(key);
     }
 
     private Map<String, List<Object>> getRouteRuleMap(DynamicConfigEvent event) {

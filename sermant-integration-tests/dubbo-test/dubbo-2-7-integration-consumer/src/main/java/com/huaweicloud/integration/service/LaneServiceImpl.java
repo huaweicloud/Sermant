@@ -19,8 +19,8 @@ package com.huaweicloud.integration.service;
 import com.huaweicloud.integration.client.ProviderClient;
 import com.huaweicloud.integration.constants.Constant;
 import com.huaweicloud.integration.entity.LaneTestEntity;
+import com.huaweicloud.integration.utils.RpcContextUtils;
 
-import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -58,11 +58,19 @@ public class LaneServiceImpl implements LaneService {
     @Value("${service_meta_version:${SERVICE_META_VERSION:${service.meta.version:1.0.0}}}")
     private String version;
 
+    @Resource(name = "barService")
+    private BarService barService;
+
     @Override
     public Map<String, Object> getLaneByDubbo(String name, LaneTestEntity laneTestEntity, String[] arr,
             List<Integer> list, Map<String, Object> map) {
-        RpcContext.getContext().setAttachment(Constant.TAG_KEY, Constant.TAG);
-        Map<String, Object> result = new HashMap<>(fooService.getAttachments());
+        Map<String, Object> result = null;
+        if (Boolean.parseBoolean(System.getProperty("execute.barService.getMetadata", "false"))) {
+            result = new HashMap<>(barService.getAttachments());
+        } else {
+            RpcContextUtils.setContextTagToAttachment(Constant.TAG_KEY, Constant.TAG);
+            result = new HashMap<>(fooService.getAttachments());
+        }
         result.put(applicationName, getMetadata());
         return result;
     }

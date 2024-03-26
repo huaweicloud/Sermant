@@ -84,8 +84,8 @@ public class LaneKindHandlerTest extends AbstractKindHandlerTest {
      */
     @Test
     public void testShouldHandle() {
-        Assert.assertTrue(handler.shouldHandle(RouterConstant.LANE_KEY_PREFIX, ""));
-        Assert.assertFalse(handler.shouldHandle(RouterConstant.LANE_KEY_PREFIX, RouterConstant.LANE_MATCH_KIND));
+        Assert.assertFalse(handler.shouldHandle(RouterConstant.LANE_KEY_PREFIX));
+        Assert.assertFalse(handler.shouldHandle(RouterConstant.LANE_KEY_PREFIX));
     }
 
     /**

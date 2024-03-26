@@ -20,6 +20,7 @@ import com.huaweicloud.integration.constants.Constant;
 import com.huaweicloud.integration.entity.LaneTestEntity;
 import com.huaweicloud.integration.entity.TestEntity;
 import com.huaweicloud.integration.service.LaneService;
+import com.huaweicloud.integration.utils.RpcContextUtils;
 
 import org.apache.dubbo.rpc.RpcContext;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -56,10 +58,11 @@ public class LaneController {
      */
     @GetMapping("/getLaneByDubbo")
     public Map<String, Object> getLaneByDubbo(TestEntity entity) throws ExecutionException, InterruptedException {
-        RpcContext.getContext().setAttachment(Constant.LANE_TEST_USER_ID, String.valueOf(entity.getId()));
+        RpcContextUtils.setContextTagToAttachment(Constant.LANE_TEST_USER_ID, String.valueOf(entity.getId()));
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", entity.getMapName());
         laneService.getLaneByDubbo(entity.getName(), new LaneTestEntity(entity.getLaneId(), entity.isEnabled()),
-                new String[]{entity.getArrName()}, Collections.singletonList(entity.getListId()),
-                Collections.singletonMap("name", entity.getMapName()));
+                new String[]{entity.getArrName()}, Collections.singletonList(entity.getListId()), map);
         Future<Map<String, Object>> future = RpcContext.getContext().getFuture();
         return future.get();
     }

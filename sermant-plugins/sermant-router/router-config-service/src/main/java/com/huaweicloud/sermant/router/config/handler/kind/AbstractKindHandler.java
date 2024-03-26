@@ -18,9 +18,11 @@
 
 package com.huaweicloud.sermant.router.config.handler.kind;
 
+import com.huaweicloud.sermant.core.plugin.config.PluginConfigManager;
 import com.huaweicloud.sermant.core.service.dynamicconfig.common.DynamicConfigEvent;
 import com.huaweicloud.sermant.core.service.dynamicconfig.common.DynamicConfigEventType;
 import com.huaweicloud.sermant.core.utils.StringUtils;
+import com.huaweicloud.sermant.router.common.config.RouterConfig;
 import com.huaweicloud.sermant.router.common.constants.RouterConstant;
 import com.huaweicloud.sermant.router.common.event.RouterEventCollector;
 import com.huaweicloud.sermant.router.common.utils.CollectionUtils;
@@ -51,6 +53,8 @@ import java.util.Map.Entry;
  * @since 2024-01-11
  */
 public abstract class AbstractKindHandler implements AbstractHandler {
+    private static final RouterConfig ROUTER_CONFIG = PluginConfigManager.getPluginConfig(RouterConfig.class);
+
     /**
      * yaml
      */
@@ -93,12 +97,12 @@ public abstract class AbstractKindHandler implements AbstractHandler {
      * 是否需要兼容性处理
      *
      * @param key 配置key
-     * @param content 配置内容
      * @return 是否需要处理
      */
     @Override
-    public boolean shouldHandle(String key, String content) {
-        return RouterConstant.MATCH_KIND_LIST.stream().noneMatch(content::contains);
+    public boolean shouldHandle(String key) {
+        // return compatibilityEnabled switch value
+        return ROUTER_CONFIG.isEnabledPreviousRule();
     }
 
     /**

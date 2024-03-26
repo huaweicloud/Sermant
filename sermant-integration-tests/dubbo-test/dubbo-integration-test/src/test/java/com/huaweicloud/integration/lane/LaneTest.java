@@ -25,6 +25,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -48,15 +49,23 @@ public class LaneTest {
     private final String baseUrl;
 
     /**
+     * 增加环境变量，控制dubbo3场景暂时不测试spring场景
+     */
+    private final boolean isExecuteSpringTest;
+
+    /**
      * 构造方法
      */
     public LaneTest() {
         baseUrl = "http://127.0.0.1:" + System.getProperty("controller.port", "28019") + "/controller/getLaneBy";
+        isExecuteSpringTest = Boolean.parseBoolean(System.getProperty("execute.spring.test", "true"));
     }
 
     @Test
     public void testDubbo() {
-        testBySpring("Dubbo");
+        if (isExecuteSpringTest){
+            testBySpring("Dubbo");
+        }
         testByDubbo("Dubbo");
 
         // 正常染色（测试dubbo取值策略）
@@ -114,14 +123,18 @@ public class LaneTest {
 
     @Test
     public void testFeign() {
-        testBySpring("Feign");
-        testByDubbo("Feign");
+        if (isExecuteSpringTest){
+            testBySpring("Feign");
+            testByDubbo("Feign");
+        }
     }
 
     @Test
     public void testRest() {
-        testBySpring("Rest");
-        testByDubbo("Rest");
+        if (isExecuteSpringTest){
+            testBySpring("Rest");
+            testByDubbo("Rest");
+        }
     }
 
     /**

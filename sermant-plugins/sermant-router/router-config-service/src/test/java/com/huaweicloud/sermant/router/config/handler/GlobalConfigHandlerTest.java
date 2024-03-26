@@ -16,10 +16,16 @@
 
 package com.huaweicloud.sermant.router.config.handler;
 
+import com.huaweicloud.sermant.core.plugin.config.PluginConfigManager;
+import com.huaweicloud.sermant.router.common.config.RouterConfig;
 import com.huaweicloud.sermant.router.common.constants.RouterConstant;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * 类描述
@@ -28,10 +34,25 @@ import org.junit.Test;
  * @since 2023-02-27
  */
 public class GlobalConfigHandlerTest {
+    private static MockedStatic<PluginConfigManager> mockConfigManager;
+
     private final AbstractConfigHandler handler;
 
     public GlobalConfigHandlerTest() {
         this.handler = new GlobalConfigHandler();
+    }
+
+    @BeforeClass
+    public static void before() {
+        mockConfigManager = Mockito.mockStatic(PluginConfigManager.class);
+        RouterConfig config = new RouterConfig();
+        mockConfigManager.when(() -> PluginConfigManager.getPluginConfig(RouterConfig.class))
+                .thenReturn(config);
+    }
+
+    @AfterClass
+    public static void after() {
+        mockConfigManager.close();
     }
 
     /**
@@ -39,6 +60,6 @@ public class GlobalConfigHandlerTest {
      */
     @Test
     public void testShouldHandle() {
-        Assert.assertTrue(handler.shouldHandle("servicecomb.globalRouteRule", RouterConstant.FLOW_MATCH_KIND));
+        Assert.assertTrue(handler.shouldHandle("servicecomb.globalRouteRule"));
     }
 }

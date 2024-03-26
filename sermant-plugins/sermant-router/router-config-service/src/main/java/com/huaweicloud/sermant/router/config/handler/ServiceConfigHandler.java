@@ -73,8 +73,8 @@ public class ServiceConfigHandler extends AbstractConfigHandler {
     }
 
     @Override
-    public boolean shouldHandle(String key, String content) {
-        return super.shouldHandle(key, content) && key.startsWith(RouterConstant.ROUTER_KEY_PREFIX + POINT);
+    public boolean shouldHandle(String key) {
+        return super.shouldHandle(key) && key.startsWith(RouterConstant.ROUTER_KEY_PREFIX + POINT);
     }
 
     private List<Map<String, Object>> getRule(DynamicConfigEvent event, String serviceName) {

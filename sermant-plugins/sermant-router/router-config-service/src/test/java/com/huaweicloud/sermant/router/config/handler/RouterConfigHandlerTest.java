@@ -16,10 +16,15 @@
 
 package com.huaweicloud.sermant.router.config.handler;
 
-import com.huaweicloud.sermant.router.common.constants.RouterConstant;
+import com.huaweicloud.sermant.core.plugin.config.PluginConfigManager;
+import com.huaweicloud.sermant.router.common.config.RouterConfig;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * 测试RouterConfigHandler
@@ -28,10 +33,25 @@ import org.junit.Test;
  * @since 2022-10-10
  */
 public class RouterConfigHandlerTest {
+    private static MockedStatic<PluginConfigManager> mockConfigManager;
+
     private final AbstractConfigHandler handler;
 
     public RouterConfigHandlerTest() {
         this.handler = new RouterConfigHandler();
+    }
+
+    @BeforeClass
+    public static void before() {
+        mockConfigManager = Mockito.mockStatic(PluginConfigManager.class);
+        RouterConfig config = new RouterConfig();
+        mockConfigManager.when(() -> PluginConfigManager.getPluginConfig(RouterConfig.class))
+                .thenReturn(config);
+    }
+
+    @AfterClass
+    public static void after() {
+        mockConfigManager.close();
     }
 
     /**
@@ -39,7 +59,7 @@ public class RouterConfigHandlerTest {
      */
     @Test
     public void testShouldHandle() {
-        Assert.assertTrue(handler.shouldHandle("servicecomb.routeRule", RouterConstant.FLOW_MATCH_KIND));
-        Assert.assertFalse(handler.shouldHandle("servicecomb.routeRule.foo", RouterConstant.FLOW_MATCH_KIND));
+        Assert.assertTrue(handler.shouldHandle("servicecomb.routeRule"));
+        Assert.assertFalse(handler.shouldHandle("servicecomb.routeRule.foo"));
     }
 }

@@ -3,5 +3,4 @@
 #
 
 com.huaweicloud.sermant.router.dubbo.declarer.RegistryDirectoryDeclarer
-com.huaweicloud.sermant.router.dubbo.declarer.Dubbo3AbstractDirectoryDeclarer
 com.huaweicloud.sermant.router.dubbo.declarer.ServiceDiscoveryRegistryDirectoryDeclarer

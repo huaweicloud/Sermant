@@ -1,0 +1,154 @@
+name: "Dubbo3 Router Test"
+description: "Auto test for dubbo3.x route for plugin sermant-router"
+runs:
+  using: "composite"
+  steps:
+    - name: entry
+      uses: ./.github/actions/common/entry
+      with:
+        log-dir: ./logs/dubbo3-router
+    - name: package dubbo 3.0.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-0'
+      run: mvn package -Ddubbo.version=3.0.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: package dubbo 3.1.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-1'
+      run: mvn package -Ddubbo.version=3.1.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: package dubbo 3.2.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-2'
+      run: mvn package -Ddubbo.version=3.2.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: post config to local-cse
+      shell: bash
+      env:
+        TEST_TYPE: router-config
+      run: mvn test --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: echo registry model
+      shell: bash
+      run: |
+        echo "=======registry-model======"-${{ matrix.registry-model }}
+    - name: remove flowcontrol for dubbo3
+      # flowcontrol plugin not support dubbo3.
+      shell: bash
+      run: |
+        mv sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/plugin/flowcontrol-plugin-${{ env.sermantVersion }}.jar sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/plugin/flowcontrol-plugin-${{ env.sermantVersion }}.jar.dubbo3
+        mv sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/service/flowcontrol-service-${{ env.sermantVersion }}.jar sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/service/flowcontrol-service-${{ env.sermantVersion }}.jar.dubbo3
+        ls sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/plugin
+    - name: start dubbo3 provider service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        ROUTER_PLUGIN_USE_REQUEST_ROUTER: false
+        SERVICE_META_VERSION: 1.0.0
+        SERVICE_META_ZONE: az1
+        SERVER_PORT: 18021
+        DUBBO_PROTOCOL_PORT: 18821
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-provider -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-provider/target/dubbo-integration-provider.jar > ${{ env.logDir }}/dubbo-zk-provider.log 2>&1 &
+    - name: start second dubbo3 provider service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        ROUTER_PLUGIN_USE_REQUEST_ROUTER: false
+        SERVICE_META_PARAMETERS: group-test:gray
+        SERVICE_META_ZONE: az1
+        SERVICE_META_VERSION: 1.0.1
+        SERVER_PORT: 38022
+        DUBBO_PROTOCOL_PORT: 18822
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-provider -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-provider/target/dubbo-integration-provider.jar > ${{ env.logDir }}/dubbo-zk-provider2.log 2>&1 &
+    - name: start third dubbo3 provider service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        ROUTER_PLUGIN_USE_REQUEST_ROUTER: false
+        SERVICE_META_PARAMETERS: group-test:red
+        SERVICE_META_ZONE: az2
+        SERVICE_META_VERSION: 1.0.1
+        SERVER_PORT: 48023
+        DUBBO_PROTOCOL_PORT: 18823
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-provider -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-provider/target/dubbo-integration-provider.jar > ${{ env.logDir }}/dubbo-zk-provider3.log 2>&1 &
+    - name: waiting for dubbo3 provider start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:18021/actuator/health 120
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:38022/actuator/health 120
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:48023/actuator/health 120
+    - name: start dubbo3 consumer service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        ROUTER_PLUGIN_USE_REQUEST_ROUTER: false
+        SERVICE_META_PARAMETERS: group-test:gray
+        SERVICE_META_ZONE: az1
+        SERVER_PORT: 28020
+        DUBBO_PROTOCOL_PORT: 18020
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-consumer -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-consumer/target/dubbo-integration-consumer.jar > ${{ env.logDir }}/zookeeper-consumer.log 2>&1 &
+    - name: waiting for dubbo3 consumer start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:28020/actuator/health 120
+    - name: start controller service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        ROUTER_PLUGIN_USE_REQUEST_ROUTER: false
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-controller -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-controller/target/dubbo-integration-controller.jar > ${{ env.logDir }}/cse-controller.log 2>&1 &
+    - name: waiting for controller start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:28019/actuator/health 120
+    - name: Sleep for 20 Seconds
+      shell: bash
+      run: sleep 20
+    - name: restore flowcontrol for dubbo3
+      # flowcontrol plugin not support dubbo3.
+      shell: bash
+      run: |
+        mv sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/plugin/flowcontrol-plugin-${{ env.sermantVersion }}.jar.dubbo3 sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/plugin/flowcontrol-plugin-${{ env.sermantVersion }}.jar
+        mv sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/service/flowcontrol-service-${{ env.sermantVersion }}.jar.dubbo3 sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/service/flowcontrol-service-${{ env.sermantVersion }}.jar
+        ls sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/plugin
+    - name: integration test dubbo3
+      shell: bash
+      env:
+        TEST_TYPE: router
+      run: mvn -Dexecute.spring.test=false test --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: exit
+      if: always()
+      uses: ./.github/actions/common/exit
+      with:
+        processor-keyword: dubbo
+    - name: if failure then upload error log
+      uses: actions/upload-artifact@v3
+      if: ${{ failure() || cancelled() }}
+      with:
+        name: (test-for-dubbo3-router)-(${{ matrix.dubbo-version }}-${{ matrix.dubbo-versions }})-logs
+        path: |
+          ./*.log
+          ./logs/**/*.log
+        if-no-files-found: warn
+        retention-days: 2

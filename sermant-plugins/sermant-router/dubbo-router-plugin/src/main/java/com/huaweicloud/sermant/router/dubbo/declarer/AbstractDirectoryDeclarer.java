@@ -35,8 +35,6 @@ public class AbstractDirectoryDeclarer extends AbstractDeclarer {
 
     private static final String METHOD_NAME = "doList";
 
-    private static final int PARAMETER_COUNT = 1;
-
     /**
      * 构造方法
      */
@@ -56,6 +54,6 @@ public class AbstractDirectoryDeclarer extends AbstractDeclarer {
      */
     @Override
     public MethodMatcher getMethodMatcher() {
-        return super.getMethodMatcher().and(MethodMatcher.paramCountEquals(PARAMETER_COUNT));
+        return super.getMethodMatcher();
     }
 }

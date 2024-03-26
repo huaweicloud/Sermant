@@ -1,0 +1,130 @@
+name: "Dubbo3 Lane Test"
+description: "Auto test for dubbo3.x lane"
+runs:
+  using: "composite"
+  steps:
+    - name: entry
+      uses: ./.github/actions/common/entry
+      with:
+        log-dir: ./logs/dubbo3-lane
+    - name: package dubbo 3.0.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-0'
+      run: mvn package -Ddubbo.version=3.0.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: package dubbo 3.1.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-1'
+      run: mvn package -Ddubbo.version=3.1.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: package dubbo 3.2.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-2'
+      run: mvn package -Ddubbo.version=3.2.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: post config to local-cse
+      shell: bash
+      env:
+        TEST_TYPE: lane-config
+      run: mvn test --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: start provider service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        SERVICE_META_APPLICATION: lane
+        SERVICE_META_VERSION: 1.0.0
+        SERVER_PORT: 18021
+        DUBBO_PROTOCOL_PORT: 18821
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-provider -Ddubbo.application.qos-enable=false -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-provider/target/dubbo-integration-provider.jar > ${{ env.logDir }}/dubbo-provider.log 2>&1 &
+    - name: start second provider service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        SERVICE_META_APPLICATION: lane
+        SERVICE_META_VERSION: 1.0.1
+        SERVER_PORT: 18022
+        DUBBO_PROTOCOL_PORT: 18822
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-provider -Ddubbo.application.qos-enable=false -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-provider/target/dubbo-integration-provider.jar > ${{ env.logDir }}/dubbo-provider2.log 2>&1 &
+    - name: waiting for providers start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:18021/actuator/health 120
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:18022/actuator/health 120
+    - name: start consumer service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        SERVICE_META_APPLICATION: lane
+        SERVICE_META_VERSION: 1.0.0
+        SERVER_PORT: 18023
+        DUBBO_PROTOCOL_PORT: 18823
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-consumer -Dexecute.barService.getMetadata=true -Ddubbo.application.qos-enable=false -Ddubbo.application.enable-file-cache=false -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-consumer/target/dubbo-integration-consumer.jar > ${{ env.logDir }}/dubbo-consumer.log 2>&1 &
+    - name: start second consumer service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        SERVICE_META_APPLICATION: lane
+        SERVICE_META_VERSION: 1.0.1
+        SERVER_PORT: 18024
+        DUBBO_PROTOCOL_PORT: 18824
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-consumer -Dexecute.barService.getMetadata=true -Ddubbo.application.qos-enable=false -Ddubbo.application.enable-file-cache=false -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-consumer/target/dubbo-integration-consumer.jar > ${{ env.logDir }}/dubbo-consumer2.log 2>&1 &
+    - name: waiting for consumer start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:18023/actuator/health 120
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:18024/actuator/health 120
+    - name: start controller service
+      shell: bash
+      env:
+        dynamic.config.dynamicConfigType: KIE
+        dynamic.config.serverAddress: 127.0.0.1:30110
+        SERVICE_META_ENVIRONMENT: development
+        SERVICE_META_APPLICATION: lane
+        DUBBO_REGISTRY_MODE: ${{ matrix.registry-model }}
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-controller -Ddubbo.application.qos-enable=false -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-controller/target/dubbo-integration-controller.jar > ${{ env.logDir }}/dubbo-controller.log 2>&1 &
+    - name: waiting for controller start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:28019/actuator/health 120
+    - name: Sleep for 10 Seconds
+      shell: bash
+      run: sleep 10
+    - name: integration test
+      shell: bash
+      env:
+        TEST_TYPE: lane
+      run: mvn -Dexecute.spring.test=false test --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: exit
+      if: always()
+      uses: ./.github/actions/common/exit
+      with:
+        processor-keyword: dubbo
+    - name: if failure then upload error log
+      uses: actions/upload-artifact@v3
+      if: ${{ failure() || cancelled() }}
+      with:
+        name: (test-for-dubbo-lane)-(${{ matrix.dubbo-version }}-${{ matrix.dubbo-versions }})-logs
+        path: |
+          ./*.log
+          ./logs/**/*.log
+        if-no-files-found: warn
+        retention-days: 2

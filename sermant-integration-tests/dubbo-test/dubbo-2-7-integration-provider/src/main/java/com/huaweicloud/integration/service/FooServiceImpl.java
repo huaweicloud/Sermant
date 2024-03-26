@@ -24,10 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -39,7 +42,10 @@ import java.util.Map;
 public class FooServiceImpl implements FooService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FooServiceImpl.class);
 
-    @Autowired
+    /**
+     * dubbo3.x场景无法注入RegistryConfig，所以增加required = false予以兼容
+     */
+    @Autowired(required = false)
     private RegistryConfig registryConfig;
 
     @Value("${service_meta_zone:${SERVICE_META_ZONE:${service.meta.zone:bar}}}")
@@ -102,7 +108,14 @@ public class FooServiceImpl implements FooService {
             }).get(context);
             return (Map<String, Object>) obj;
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            LOGGER.error("Cannot get attachments.", e);
+            LOGGER.warn(String.format(Locale.ENGLISH, "Cannot get attachments field: %s", e.getMessage()));
+            try {
+                Method method = context.getClass().getDeclaredMethod("getAttachments");
+                method.setAccessible(true);
+                return (Map<String, Object>) method.invoke(context);
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException ex) {
+                LOGGER.error("Cannot get attachments.", e);
+            }
         }
         return Collections.emptyMap();
     }

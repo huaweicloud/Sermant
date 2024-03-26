@@ -29,7 +29,6 @@ import com.huaweicloud.sermant.router.common.service.AbstractDirectoryService;
  * @since 2021-06-28
  */
 public class AbstractDirectoryInterceptor extends AbstractInterceptor {
-    private static final int INDEX = 0;
     private final AbstractDirectoryService abstractDirectoryService;
 
     /**
@@ -48,7 +47,11 @@ public class AbstractDirectoryInterceptor extends AbstractInterceptor {
     @Override
     public ExecuteContext after(ExecuteContext context) {
         Object[] arguments = context.getArguments();
-        context.changeResult(abstractDirectoryService.selectInvokers(context.getObject(), arguments[INDEX],
+
+        // DUBBO 2.x and DUBBO 3.O.x dolist method is one parameter/3.1.x two parameter/3.2.x three parameter
+        // all version invocation parameter at last
+        Object invocation = arguments[arguments.length - 1];
+        context.changeResult(abstractDirectoryService.selectInvokers(context.getObject(), invocation,
                 context.getResult()));
         LogUtils.printDubboRequestAfterPoint(context);
         return context;

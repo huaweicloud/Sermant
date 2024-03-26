@@ -88,6 +88,12 @@ public class RouterConfig implements PluginConfig {
     private String parseHeaderTag;
 
     /**
+     * compatibility router config 1.0, default is false not support
+     */
+    @ConfigFieldKey("enabled-previous-rule")
+    private boolean enabledPreviousRule = false;
+
+    /**
      * 构造方法
      */
     public RouterConfig() {
@@ -180,5 +186,13 @@ public class RouterConfig implements PluginConfig {
 
     public void setParseHeaderTag(String parseHeaderTag) {
         this.parseHeaderTag = parseHeaderTag;
+    }
+
+    public boolean isEnabledPreviousRule() {
+        return enabledPreviousRule;
+    }
+
+    public void setEnabledPreviousRule(boolean enabledPreviousRule) {
+        this.enabledPreviousRule = enabledPreviousRule;
     }
 }
