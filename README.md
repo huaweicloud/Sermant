@@ -128,3 +128,17 @@ Sermant 采用 [Apache 2.0 License.](/LICENSE)
 * 微信交流群：请先申请Sermant小二为好友，通过后会拉您进群，申请时请备注公司+职务，谢谢。
 
 ![pic](docs/binary-docs/contact-wechat.png)
+
+## 谁在使用Sermant
+
+感谢各位用户和开发者对Sermant的关注和使用。
+
+如果您已经在使用Sermant, 欢迎在 [Wanted: Who's using Sermant](https://github.com/huaweicloud/Sermant/issues/1396) 上填写用户信息来获取Sermant的开源落地技术支持。
+
+![用友](https://www.yonyou.com/assets/images/g_01.png)
+![零束](https://www.z-one.tech/wp-content/uploads/elementor/thumbs/logo-title-qbki8wpvwkaow46sayzjvxniks1btm8a9eefzu78uo.png)
+![鲸灵](https://cdn.webuy.ai/others/assets/img/2022/01/27/9fb67cdb-17e9-4d45-9f63-0e5311cbe817____size270x92.png?x-oss-process=image/format,webp/quality,q_60)
+![马上消费](https://picx.zhimg.com/70/v2-9280d36bd53d54bb7b62aa7766f77b94_1440w.avis?source=172ae18b&biz_tag=Post)
+![CPTS](https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/DeveloperServices/CodeArtsPerfTest.png "华为云CPTS")华为云CPTS
+![MAS](https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Middleware/MAS.png "华为云MAS")华为云MAS
+![CSE](https://res-static.hc-cdn.cn/cloudbu-site/public/new-product-icon/Middleware/CSE.png "华为云CSE")华为云CSE
