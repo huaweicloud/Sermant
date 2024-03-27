@@ -43,6 +43,9 @@ public class ServiceConfig implements BaseConfig {
     @ConfigFieldKey("dynamic.config.enable")
     private boolean dynamicConfigEnable = false;
 
+    @ConfigFieldKey("httpserver.enable")
+    private boolean httpserverEnable = false;
+
     public boolean isHeartBeatEnable() {
         return heartBeatEnable;
     }
@@ -83,6 +86,14 @@ public class ServiceConfig implements BaseConfig {
         this.dynamicConfigEnable = dynamicConfigEnable;
     }
 
+    public boolean isHttpserverEnable() {
+        return httpserverEnable;
+    }
+
+    public void setHttpserverEnable(boolean httpserverEnable) {
+        this.httpserverEnable = httpserverEnable;
+    }
+
     /**
      * 通过服务的类名来检查该类型服务是否开启
      *
@@ -104,6 +115,9 @@ public class ServiceConfig implements BaseConfig {
         }
         if (ServiceManager.INJECT_SERVICE_IMPL.equals(serviceName)) {
             return isInjectEnable();
+        }
+        if (ServiceManager.HTTP_SERVER_SERVICE_IMPL.equals(serviceName)) {
+            return isHttpserverEnable();
         }
         return false;
     }

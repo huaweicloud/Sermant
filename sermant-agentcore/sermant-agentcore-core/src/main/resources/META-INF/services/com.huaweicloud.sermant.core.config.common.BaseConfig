@@ -8,3 +8,4 @@ com.huaweicloud.sermant.core.service.inject.config.InjectConfig
 com.huaweicloud.sermant.core.service.send.config.GatewayConfig
 com.huaweicloud.sermant.core.plugin.config.ServiceMeta
 com.huaweicloud.sermant.core.notification.config.NotificationConfig
+com.huaweicloud.sermant.core.service.httpserver.config.HttpServerConfig

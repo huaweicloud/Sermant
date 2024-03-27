@@ -63,6 +63,7 @@
         <junit.jupiter.version>5.8.1</junit.jupiter.version>
         <mockito-core.version>3.9.0</mockito-core.version>
         <mockito-inline.version>3.9.0</mockito-inline.version>
+        <metainf-services.version>1.9</metainf-services.version>
 
         <clean.plugin.version>2.5</clean.plugin.version>
         <compiler.plugin.version>3.8.1</compiler.plugin.version>

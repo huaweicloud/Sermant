@@ -79,6 +79,12 @@ public class ServiceManager {
             "com.huaweicloud.sermant.implement.service.tracing.TracingServiceImpl";
 
     /**
+     * HttpServer服务类名
+     */
+    public static final String HTTP_SERVER_SERVICE_IMPL =
+            "com.huaweicloud.sermant.implement.service.httpserver.HttpServerServiceImpl";
+
+    /**
      * 日志
      */
     private static final Logger LOGGER = LoggerFactory.getLogger();
